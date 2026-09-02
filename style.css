@@ -67,3 +67,56 @@ button:hover {
     font-size: 18px;
     color: #666;
 }
+
+/* Piano Keyboard */
+
+#keyboard {
+    display: flex;
+    position: relative;
+    height: 220px;
+    margin-top: 20px;
+    overflow-x: auto;
+}
+
+.piano-key {
+    flex: 1;
+    min-width: 70px;
+    height: 200px;
+    border: 1px solid #222;
+    border-radius: 0 0 6px 6px;
+    background: white;
+    color: #222;
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 15px;
+}
+
+.piano-key:hover {
+    background: #eee;
+}
+
+.piano-key.selected {
+    background: #bdbdbd;
+}
+
+.piano-key.black {
+    background: #111;
+    color: white;
+    height: 125px;
+    min-width: 45px;
+    margin-left: -22px;
+    margin-right: -22px;
+    z-index: 2;
+    border-radius: 0 0 5px 5px;
+}
+
+.piano-key.black:hover {
+    background: #333;
+}
+
+.piano-key.black.selected {
+    background: #555;
+}

@@ -3,14 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chordictionary</title>
-    
-    <link rel="stylesheet" href="style.css">
 
+    <title>Chordictionary</title>
+
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
+
+<header>
     <h1>Chordictionary</h1>
-    <p>コード解析アプリ</p>
+    <p>コードを「聴いて・弾いて・知る」</p>
+</header>
+
+<main>
+
+    <!-- 音声ファイル -->
+    <section class="card">
+        <h2>🎵 音声解析</h2>
+
+        <input
+            type="file"
+            id="audio-file"
+            accept="audio/*"
+        >
+
+        <p id="audio-status">
+            音声ファイルを選択してください。
+        </p>
+    </section>
+
+
+    <!-- コード表示 -->
+    <section class="card">
+        <h2>判定されたコード</h2>
+
+        <div id="chord-name">---</div>
+
+        <div id="notes">
+            構成音：---
+        </div>
+    </section>
+
+
+    <!-- キーボード -->
+    <section class="card">
+        <h2>🎹 Keyboard</h2>
+
+        <div id="keyboard"></div>
+    </section>
+
+
+    <!-- ギター -->
+    <section class="card">
+        <h2>🎸 Guitar</h2>
+
+        <div id="guitar"></div>
+    </section>
+
+
+    <!-- コード情報 -->
+    <section class="card">
+        <h2>📖 コード情報</h2>
+
+        <div id="chord-info">
+
+            <p>
+                <strong>役割：</strong>
+                <span id="function">---</span>
+            </p>
+
+            <p>
+                <strong>次に来やすいコード：</strong>
+                <span id="next-chords">---</span>
+            </p>
+
+            <p>
+                <strong>雰囲気：</strong>
+                <span id="mood">---</span>
+            </p>
+
+        </div>
+    </section>
+
+</main>
+
+<script src="js/chordDetector.js"></script>
+<script src="js/keyboard.js"></script>
+
 </body>
 </html>
