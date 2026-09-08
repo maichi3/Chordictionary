@@ -43,19 +43,21 @@ main {
     margin-top: 0;
 }
 
+
+/* =========================
+   ボタン
+========================= */
+
 button {
     border: none;
-    border-radius: 8px;
-    padding: 12px 20px;
-    background: #222;
-    color: white;
     cursor: pointer;
     font-size: 15px;
 }
 
-button:hover {
-    background: #444;
-}
+
+/* =========================
+   コード表示
+========================= */
 
 #chord-name {
     font-size: 48px;
@@ -68,55 +70,137 @@ button:hover {
     color: #666;
 }
 
-/* Piano Keyboard */
+
+/* =========================
+   ピアノ
+========================= */
 
 #keyboard {
-    display: flex;
     position: relative;
-    height: 220px;
+    width: 100%;
+    height: 230px;
     margin-top: 20px;
     overflow-x: auto;
+    overflow-y: hidden;
+    user-select: none;
 }
 
-.piano-key {
-    flex: 1;
-    min-width: 70px;
-    height: 200px;
-    border: 1px solid #222;
-    border-radius: 0 0 6px 6px;
+
+/* 白鍵 */
+
+.piano-key.white {
+    position: absolute;
+
+    top: 0;
+
+    width: 80px;
+    height: 210px;
+
     background: white;
+
+    border: 1px solid #222;
+    border-radius: 0 0 8px 8px;
+
     color: #222;
-    position: relative;
-    z-index: 1;
+
     display: flex;
     align-items: flex-end;
     justify-content: center;
+
     padding-bottom: 15px;
+
+    z-index: 1;
+
+    transition: background 0.1s;
 }
 
-.piano-key:hover {
-    background: #eee;
+
+.piano-key.white:hover {
+    background: #eeeeee;
 }
 
-.piano-key.selected {
-    background: #bdbdbd;
+
+.piano-key.white.selected {
+    background: #c9ddff;
 }
+
+
+/* 黒鍵 */
 
 .piano-key.black {
+    position: absolute;
+
+    top: 0;
+
+    width: 50px;
+    height: 130px;
+
     background: #111;
+
     color: white;
-    height: 125px;
-    min-width: 45px;
-    margin-left: -22px;
-    margin-right: -22px;
+
+    border-radius: 0 0 6px 6px;
+
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+
+    padding-bottom: 12px;
+
     z-index: 2;
-    border-radius: 0 0 5px 5px;
+
+    transition: background 0.1s;
 }
+
 
 .piano-key.black:hover {
     background: #333;
 }
 
+
 .piano-key.black.selected {
-    background: #555;
+    background: #4d8cff;
+}
+
+
+/* =========================
+   コード情報
+========================= */
+
+#chord-info p {
+    margin: 12px 0;
+}
+
+
+/* =========================
+   スマートフォン対応
+========================= */
+
+@media (max-width: 700px) {
+
+    main {
+        padding: 0 10px;
+    }
+
+    .card {
+        padding: 18px;
+    }
+
+    #chord-name {
+        font-size: 38px;
+    }
+
+    #keyboard {
+        height: 210px;
+    }
+
+    .piano-key.white {
+        width: 65px;
+        height: 190px;
+    }
+
+    .piano-key.black {
+        width: 42px;
+        height: 115px;
+    }
 }
