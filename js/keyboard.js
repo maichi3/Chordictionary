@@ -21,7 +21,6 @@ let audioContext = null;
 
 function playNote(frequency) {
 
-    // 初回クリック時に音声システムを作る
     if (!audioContext) {
         audioContext = new (
             window.AudioContext ||
@@ -29,7 +28,6 @@ function playNote(frequency) {
         )();
     }
 
-    // 音声を再開
     if (audioContext.state === "suspended") {
         audioContext.resume();
     }
@@ -104,26 +102,33 @@ for (let octave = 0; octave < 2; octave++) {
         // 鍵盤をクリック
         key.addEventListener("click", () => {
 
+            // ★ 2オクターブ目は周波数を2倍
+            const frequency =
+                octave === 0
+                    ? note.frequency
+                    : note.frequency * 2;
+
             // 音を鳴らす
-            playNote(note.frequency);
+            playNote(frequency);
 
-            const noteName = note.name;
+           const noteName = note.name;
+const noteId = octave + "-" + note.name;
 
-            // 選択・解除
-            if (selectedNotes.includes(noteName)) {
+// 選択・解除
+if (selectedNotes.includes(noteId)) {
 
-                selectedNotes = selectedNotes.filter(
-                    selected => selected !== noteName
-                );
+    selectedNotes = selectedNotes.filter(
+        selected => selected !== noteId
+    );
 
-                key.classList.remove("selected");
+    key.classList.remove("selected");
 
-            } else {
+} else {
 
-                selectedNotes.push(noteName);
+    selectedNotes.push(noteId);
 
-                key.classList.add("selected");
-            }
+    key.classList.add("selected");
+}
 
             updateChordDisplay();
         });
@@ -169,13 +174,19 @@ function updateChordDisplay() {
     }
 
 
-    const chord =
-        detectChord(selectedNotes);
+  const noteNames = [
+    ...new Set(
+        selectedNotes.map(note => note.split("-")[1])
+    )
+];
 
+const chord =
+    detectChord(noteNames);
 
     notesDisplay.textContent =
-        "構成音：" +
-        selectedNotes.join(" - ");
+    "構成音：" +
+    noteNames
+        .join(" - ");
 
 
     if (chord) {
