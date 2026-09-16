@@ -47,7 +47,7 @@ function detectChord(selectedNotes) {
         return null;
     }
 
-    // 音名と鍵盤上の位置を取得
+    // 鍵盤上の高さを取得
     const noteData = selectedNotes.map(noteId => {
         const parts = noteId.split("-");
         const octave = Number(parts[0]);
@@ -60,6 +60,11 @@ function detectChord(selectedNotes) {
         };
     });
 
+    // 一番低い音
+    const bass = noteData.reduce((lowest, note) => {
+        return note.value < lowest.value ? note : lowest;
+    });
+
     // 音名を重複なしにする
     const uniqueNotes = [
         ...new Set(noteData.map(note => note.name))
@@ -69,14 +74,15 @@ function detectChord(selectedNotes) {
         return null;
     }
 
-    const noteValues = uniqueNotes
-        .map(note => noteNumbers[note])
-        .sort((a, b) => a - b);
+    const noteValues = uniqueNotes.map(
+        note => noteNumbers[note]
+    );
 
-    // 実際に一番低い鍵盤
-    const bass = noteData.reduce((lowest, note) => {
-        return note.value < lowest.value ? note : lowest;
-    });
+    const candidates = [];
+
+    // --------------------------------
+    // ① 全コード候補を探す
+    // --------------------------------
 
     for (const root of noteValues) {
 
@@ -99,24 +105,40 @@ function detectChord(selectedNotes) {
                         name => noteNumbers[name] === root
                     );
 
-                let chordName =
-                    rootName + pattern.suffix;
+                const isSlash = bass.name !== rootName;
 
-                // ルート以外の音が最低音ならオンコード
-                if (bass.name !== rootName) {
-                    chordName += "/" + bass.name;
-                }
+                candidates.push({
+                    name:
+                        rootName +
+                        pattern.suffix +
+                        (isSlash ? "/" + bass.name : ""),
 
-                return {
-                    name: chordName,
                     root: rootName,
                     bass: bass.name,
                     notes: uniqueNotes,
-                    intervals: pattern.intervals
-                };
+                    intervals: pattern.intervals,
+
+                    // 優先順位
+                    score:
+                        isSlash
+                            ? 100
+                            : pattern.intervals.length === 3
+                                ? 80
+                                : 60
+                });
             }
         }
     }
 
-    return null;
+    // --------------------------------
+    // ② 最も優先度の高いコードを返す
+    // --------------------------------
+
+    if (candidates.length === 0) {
+        return null;
+    }
+
+    candidates.sort((a, b) => b.score - a.score);
+
+    return candidates[0];
 }

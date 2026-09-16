@@ -181,14 +181,24 @@ function updateChordDisplay() {
 ];
 
 const chord =
-    detectChord(noteNames);
+    detectChord(selectedNotes);
 
-    notesDisplay.textContent =
+   const sortedNotes = [...selectedNotes].sort((a, b) => {
+    const [octaveA, noteA] = a.split("-");
+    const [octaveB, noteB] = b.split("-");
+
+    const valueA = Number(octaveA) * 12 + noteNumbers[noteA];
+    const valueB = Number(octaveB) * 12 + noteNumbers[noteB];
+
+    return valueA - valueB;
+});
+
+notesDisplay.textContent =
     "構成音：" +
-    noteNames
+    sortedNotes
+        .map(note => note.split("-")[1])
         .join(" - ");
-
-
+        
     if (chord) {
 
         chordName.textContent =
