@@ -80,6 +80,56 @@ function detectChord(selectedNotes) {
 
     const candidates = [];
 
+        // ルートが最低音の場合は通常コードを優先
+    const bassIsRoot = noteValues.includes(noteNumbers[bass.name]);
+
+        // C/D のようなオンコードを判定
+    const bassRemoved = noteValues.filter(
+        note => note !== noteNumbers[bass.name]
+    );
+
+    if (bassRemoved.length === 3) {
+
+        for (const root of bassRemoved) {
+
+            const intervals = bassRemoved
+                .map(note => (note - root + 12) % 12)
+                .sort((a, b) => a - b);
+
+            for (const pattern of chordPatterns) {
+
+                if (
+                    intervals.length === pattern.intervals.length &&
+                    intervals.every(
+                        (value, index) =>
+                            value === pattern.intervals[index]
+                    )
+                ) {
+
+                    const rootName = Object.keys(noteNumbers)
+                        .find(
+                            name => noteNumbers[name] === root
+                        );
+
+                    candidates.push({
+                        name:
+                            rootName +
+                            pattern.suffix +
+                            "/" +
+                            bass.name,
+
+                        root: rootName,
+                        bass: bass.name,
+                        notes: uniqueNotes,
+                        intervals: pattern.intervals,
+
+                        score: 80
+                    });
+                }
+            }
+        }
+    }
+      
     // --------------------------------
     // ① 全コード候補を探す
     // --------------------------------
@@ -119,12 +169,10 @@ function detectChord(selectedNotes) {
                     intervals: pattern.intervals,
 
                     // 優先順位
-                    score:
-                        isSlash
-                            ? 100
-                            : pattern.intervals.length === 3
-                                ? 80
-                                : 60
+                   score:
+    isSlash
+        ? 70
+        : 100
                 });
             }
         }

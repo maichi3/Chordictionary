@@ -167,4 +167,79 @@ const chordDatabase = {
         next: "Em7 / Gmaj7 / A7",
         mood: "柔らかい・落ち着き・浮遊感"
     }
+        ,
+
+    "C6": {
+        function: "トニック",
+        next: "F / G / Am",
+        mood: "明るい・柔らかい・穏やか"
+    },
+
+    "Cm6": {
+        function: "トニック系",
+        next: "Fm / G / Ab",
+        mood: "切ない・ジャズっぽい・落ち着き"
+    },
+
+    "Cadd9": {
+        function: "トニック",
+        next: "F / G / Am",
+        mood: "明るい・広がり・透明感"
+    },
+
+    "Cmadd9": {
+        function: "トニック系",
+        next: "Fm / G / Ab",
+        mood: "切ない・浮遊感・広がり"
+    },
+
+    "Csus2": {
+        function: "トニック系",
+        next: "F / G / Am",
+        mood: "開放的・爽やか・浮遊感"
+    },
+
+    "Csus4": {
+        function: "トニック系",
+        next: "C / G / F",
+        mood: "緊張感・解決感・広がり"
+    },
+
+    "Cdim": {
+        function: "経過コード",
+        next: "C# / D / Eb",
+        mood: "不安定・緊張感・不穏"
+    },
+
+    "Caug": {
+        function: "トニック系",
+        next: "F / Am / Ab",
+        mood: "浮遊感・不思議・不安定"
+    }
+        ,
+
+    "Cm7♭5": {
+        function: "サブドミナント系",
+        next: "Fm / G7",
+        mood: "暗い・不安定・緊張感"
+    }
+    ,
+
+"C/E": {
+    function: "トニック",
+    next: "F / G / Am",
+    mood: "明るい・安定・ベースが上昇する感じ"
+},
+
+"C/G": {
+    function: "トニック",
+    next: "F / G / Am",
+    mood: "安定・力強い・広がり"
+},
+
+"C/D": {
+    function: "ドミナント系",
+    next: "G / G7",
+    mood: "浮遊感・緊張感・次へ進む感じ"
+}
 };
