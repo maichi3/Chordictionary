@@ -1,3 +1,4 @@
+console.log(keyNextChords);
 const notes = [
     { name: "C", type: "white", frequency: 261.63 },
     { name: "C#", type: "black", position: 0, frequency: 277.18 },
@@ -199,47 +200,63 @@ notesDisplay.textContent =
         .map(note => note.split("-")[1])
         .join(" - ");
         
-    if (chord) {
+   if (chord) {
+    chordName.textContent =
+        chord.name;
 
-        chordName.textContent =
-            chord.name;
+    const information =
+        chordDatabase[chord.name];
 
-        const information =
-            chordDatabase[chord.name];
+    if (information) {
 
+        const keyInfo =
+            keyFunctions[currentKey];
 
-        if (information) {
+        const keyFunction =
+            keyInfo && keyInfo[chord.name];
 
+        if (keyFunction) {
+            functionDisplay.textContent =
+                keyFunction;
+        } else {
             functionDisplay.textContent =
                 information.function;
-
-            nextChordsDisplay.textContent =
-                information.next;
-
-            moodDisplay.textContent =
-                information.mood;
-
-        } else {
-
-            functionDisplay.textContent =
-                "情報なし";
-
-            nextChordsDisplay.textContent =
-                "情報なし";
-
-            moodDisplay.textContent =
-                "情報なし";
         }
 
+        const keyNext =
+            keyNextChords[currentKey];
+
+        const nextChords =
+            keyNext && keyNext[chord.name];
+
+        nextChordsDisplay.textContent =
+            nextChords || information.next;
+
+        moodDisplay.textContent =
+            information.mood;
+
     } else {
+        functionDisplay.textContent =
+            "情報なし";
 
-        chordName.textContent =
-            "判定できません";
+        nextChordsDisplay.textContent =
+            "情報なし";
 
-        functionDisplay.textContent = "---";
-
-        nextChordsDisplay.textContent = "---";
-
-        moodDisplay.textContent = "---";
+        moodDisplay.textContent =
+            "情報なし";
     }
+
+} else {
+    chordName.textContent =
+        "判定できません";
+
+    functionDisplay.textContent =
+        "---";
+
+    nextChordsDisplay.textContent =
+        "---";
+
+    moodDisplay.textContent =
+        "---";
+}
 }

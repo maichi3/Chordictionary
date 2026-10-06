@@ -243,3 +243,214 @@ const chordDatabase = {
     mood: "浮遊感・緊張感・次へ進む感じ"
 }
 };
+let currentKey = "C-major";
+
+const keySelect = document.getElementById("key-select");
+
+keySelect.addEventListener("change", () => {
+    currentKey = keySelect.value;
+
+    console.log("現在のキー:", currentKey);
+
+    if (typeof updateChordDisplay === "function") {
+        updateChordDisplay();
+    }
+});
+
+const keyFunctions = {
+
+    "C-major": {
+        "C": "I（トニック）",
+        "Dm": "ii（サブドミナント）",
+        "Em": "iii（トニック系）",
+        "F": "IV（サブドミナント）",
+        "G": "V（ドミナント）",
+        "Am": "vi（トニック系）",
+        "Bdim": "vii°（ドミナント系）"
+    },
+
+    "G-major": {
+        "G": "I（トニック）",
+        "Am": "ii（サブドミナント）",
+        "Bm": "iii（トニック系）",
+        "C": "IV（サブドミナント）",
+        "D": "V（ドミナント）",
+        "Em": "vi（トニック系）",
+        "F#dim": "vii°（ドミナント系）"
+    },
+
+    "D-major": {
+        "D": "I（トニック）",
+        "Em": "ii（サブドミナント）",
+        "F#m": "iii（トニック系）",
+        "G": "IV（サブドミナント）",
+        "A": "V（ドミナント）",
+        "Bm": "vi（トニック系）",
+        "C#dim": "vii°（ドミナント系）"
+    },
+
+    "A-major": {
+        "A": "I（トニック）",
+        "Bm": "ii（サブドミナント）",
+        "C#m": "iii（トニック系）",
+        "D": "IV（サブドミナント）",
+        "E": "V（ドミナント）",
+        "F#m": "vi（トニック系）",
+        "G#dim": "vii°（ドミナント系）"
+    },
+
+    "E-major": {
+        "E": "I（トニック）",
+        "F#m": "ii（サブドミナント）",
+        "G#m": "iii（トニック系）",
+        "A": "IV（サブドミナント）",
+        "B": "V（ドミナント）",
+        "C#m": "vi（トニック系）",
+        "D#dim": "vii°（ドミナント系）"
+    },
+
+    "B-major": {
+        "B": "I（トニック）",
+        "C#m": "ii（サブドミナント）",
+        "D#m": "iii（トニック系）",
+        "E": "IV（サブドミナント）",
+        "F#": "V（ドミナント）",
+        "G#m": "vi（トニック系）",
+        "A#dim": "vii°（ドミナント系）"
+    },
+
+    "F-major": {
+        "F": "I（トニック）",
+        "Gm": "ii（サブドミナント）",
+        "Am": "iii（トニック系）",
+        "Bb": "IV（サブドミナント）",
+        "C": "V（ドミナント）",
+        "Dm": "vi（トニック系）",
+        "Edim": "vii°（ドミナント系）"
+    },
+
+    "A-minor": {
+        "Am": "i（トニック）",
+        "Bdim": "ii°（サブドミナント系）",
+        "C": "III（トニック系）",
+        "Dm": "iv（サブドミナント）",
+        "Em": "v（ドミナント系）",
+        "F": "VI（サブドミナント系）",
+        "G": "VII（ドミナント系）"
+    },
+
+    "E-minor": {
+        "Em": "i（トニック）",
+        "F#dim": "ii°（サブドミナント系）",
+        "G": "III（トニック系）",
+        "Am": "iv（サブドミナント）",
+        "Bm": "v（ドミナント系）",
+        "C": "VI（サブドミナント系）",
+        "D": "VII（ドミナント系）"
+    },
+
+    "B-minor": {
+        "Bm": "i（トニック）",
+        "C#dim": "ii°（サブドミナント系）",
+        "D": "III（トニック系）",
+        "Em": "iv（サブドミナント）",
+        "F#m": "v（ドミナント系）",
+        "G": "VI（サブドミナント系）",
+        "A": "VII（ドミナント系）"
+    }
+};
+const keyNextChords = {
+
+    "C-major": {
+        "C": "F / G / Am",
+        "Dm": "G / Am / C",
+        "Em": "Am / C / F",
+        "F": "G / C / Dm",
+        "G": "C / Em / Am",
+        "Am": "Dm / F / G"
+    },
+
+    "G-major": {
+        "G": "C / D / Em",
+        "Am": "D / Em / C",
+        "Bm": "Em / G / D",
+        "C": "D / G / Am",
+        "D": "G / Bm / Em",
+        "Em": "Am / C / D"
+    },
+
+    "D-major": {
+        "D": "G / A / Bm",
+        "Em": "A / Bm / D",
+        "F#m": "Bm / D / E",
+        "G": "A / D / Em",
+        "A": "D / F#m / Bm",
+        "Bm": "Em / G / A"
+    },
+
+    "A-major": {
+        "A": "D / E / F#m",
+        "Bm": "E / F#m / A",
+        "C#m": "F#m / A / B",
+        "D": "E / A / Bm",
+        "E": "A / C#m / F#m",
+        "F#m": "Bm / D / E"
+    },
+
+    "E-major": {
+        "E": "A / B / C#m",
+        "F#m": "B / C#m / E",
+        "G#m": "C#m / E / A",
+        "A": "B / E / F#m",
+        "B": "E / G#m / C#m",
+        "C#m": "F#m / A / B"
+    },
+
+    "B-major": {
+        "B": "E / F# / G#m",
+        "C#m": "F# / G#m / B",
+        "D#m": "G#m / B / E",
+        "E": "F# / B / C#m",
+        "F#": "B / D#m / G#m",
+        "G#m": "C#m / E / F#"
+    },
+
+    "F-major": {
+        "F": "Bb / C / Dm",
+        "Gm": "C / Dm / F",
+        "Am": "Dm / F / Gm",
+        "Bb": "C / F / Gm",
+        "C": "F / Am / Dm",
+        "Dm": "Gm / Bb / C"
+    },
+
+    "A-minor": {
+        "Am": "Dm / F / G",
+        "Bdim": "Dm / Em",
+        "C": "F / G / Am",
+        "Dm": "G / Am / C",
+        "Em": "Am / C / Dm",
+        "F": "G / Am / C",
+        "G": "Am / C / Dm"
+    },
+
+    "E-minor": {
+        "Em": "Am / C / D",
+        "F#dim": "Am / Bm",
+        "G": "C / D / Em",
+        "Am": "D / Em / G",
+        "Bm": "Em / G / Am",
+        "C": "D / Em / G",
+        "D": "Em / G / Am"
+    },
+
+    "B-minor": {
+        "Bm": "Em / G / A",
+        "C#dim": "Em / F#m",
+        "D": "G / A / Bm",
+        "Em": "A / Bm / D",
+        "F#m": "Bm / D / Em",
+        "G": "A / Bm / D",
+        "A": "Bm / D / Em"
+    }
+};
