@@ -169,9 +169,64 @@ const chordDatabase = {
     }
         ,
 
-    "C6": {
-        function: "トニック",
+      "C6": {
+        function: "トニック系",
         next: "F / G / Am",
+        mood: "明るい・柔らかい・穏やか"
+    },
+    "C#6": {
+        function: "トニック系",
+        next: "F# / G# / A#m",
+        mood: "明るい・柔らかい・穏やか"
+    },
+    "D6": {
+        function: "トニック系",
+        next: "G / A / Bm",
+        mood: "明るい・柔らかい・穏やか"
+    },
+    "D#6": {
+        function: "トニック系",
+        next: "G# / A# / Cm",
+        mood: "明るい・柔らかい・穏やか"
+    },
+    "E6": {
+        function: "トニック系",
+        next: "A / B / C#m",
+        mood: "明るい・柔らかい・穏やか"
+    },
+    "F6": {
+        function: "トニック系",
+        next: "Bb / C / Dm",
+        mood: "明るい・柔らかい・穏やか"
+    },
+    "F#6": {
+        function: "トニック系",
+        next: "B / C# / D#m",
+        mood: "明るい・柔らかい・穏やか"
+    },
+    "G6": {
+        function: "トニック系",
+        next: "C / D / Em",
+        mood: "明るい・柔らかい・穏やか"
+    },
+    "G#6": {
+        function: "トニック系",
+        next: "C# / D# / Fm",
+        mood: "明るい・柔らかい・穏やか"
+    },
+    "A6": {
+        function: "トニック系",
+        next: "D / E / F#m",
+        mood: "明るい・柔らかい・穏やか"
+    },
+    "A#6": {
+        function: "トニック系",
+        next: "D# / F / Gm",
+        mood: "明るい・柔らかい・穏やか"
+    },
+    "B6": {
+        function: "トニック系",
+        next: "E / F# / G#m",
         mood: "明るい・柔らかい・穏やか"
     },
 
@@ -180,16 +235,181 @@ const chordDatabase = {
         next: "Fm / G / Ab",
         mood: "切ない・ジャズっぽい・落ち着き"
     },
+    "C#m6": {
+        function: "トニック系",
+        next: "F#m / G# / A",
+        mood: "切ない・ジャズっぽい・落ち着き"
+    },
+    "Dm6": {
+        function: "トニック系",
+        next: "Gm / A / Bb",
+        mood: "切ない・ジャズっぽい・落ち着き"
+    },
+    "D#m6": {
+        function: "トニック系",
+        next: "G#m / A# / B",
+        mood: "切ない・ジャズっぽい・落ち着き"
+    },
+    "Em6": {
+        function: "トニック系",
+        next: "Am / B / C",
+        mood: "切ない・ジャズっぽい・落ち着き"
+    },
+    "Fm6": {
+        function: "トニック系",
+        next: "Bbm / C / Db",
+        mood: "切ない・ジャズっぽい・落ち着き"
+    },
+    "F#m6": {
+        function: "トニック系",
+        next: "Bm / C# / D",
+        mood: "切ない・ジャズっぽい・落ち着き"
+    },
+    "Gm6": {
+        function: "トニック系",
+        next: "Cm / D / Eb",
+        mood: "切ない・ジャズっぽい・落ち着き"
+    },
+    "G#m6": {
+        function: "トニック系",
+        next: "C#m / D# / E",
+        mood: "切ない・ジャズっぽい・落ち着き"
+    },
+    "Am6": {
+        function: "トニック系",
+        next: "Dm / E / F",
+        mood: "切ない・ジャズっぽい・落ち着き"
+    },
+    "A#m6": {
+        function: "トニック系",
+        next: "D#m / F / F#",
+        mood: "切ない・ジャズっぽい・落ち着き"
+    },
+    "Bm6": {
+        function: "トニック系",
+        next: "Em / F# / G",
+        mood: "切ない・ジャズっぽい・落ち着き"
+    },
 
     "Cadd9": {
-        function: "トニック",
+        function: "トニック系",
         next: "F / G / Am",
+        mood: "明るい・広がり・透明感"
+    },
+    "C#add9": {
+        function: "トニック系",
+        next: "F# / G# / A#m",
+        mood: "明るい・広がり・透明感"
+    },
+    "Dadd9": {
+        function: "トニック系",
+        next: "G / A / Bm",
+        mood: "明るい・広がり・透明感"
+    },
+    "D#add9": {
+        function: "トニック系",
+        next: "G# / A# / Cm",
+        mood: "明るい・広がり・透明感"
+    },
+    "Eadd9": {
+        function: "トニック系",
+        next: "A / B / C#m",
+        mood: "明るい・広がり・透明感"
+    },
+    "Fadd9": {
+        function: "トニック系",
+        next: "Bb / C / Dm",
+        mood: "明るい・広がり・透明感"
+    },
+    "F#add9": {
+        function: "トニック系",
+        next: "B / C# / D#m",
+        mood: "明るい・広がり・透明感"
+    },
+    "Gadd9": {
+        function: "トニック系",
+        next: "C / D / Em",
+        mood: "明るい・広がり・透明感"
+    },
+    "G#add9": {
+        function: "トニック系",
+        next: "C# / D# / Fm",
+        mood: "明るい・広がり・透明感"
+    },
+    "Aadd9": {
+        function: "トニック系",
+        next: "D / E / F#m",
+        mood: "明るい・広がり・透明感"
+    },
+    "A#add9": {
+        function: "トニック系",
+        next: "D# / F / Gm",
+        mood: "明るい・広がり・透明感"
+    },
+    "Badd9": {
+        function: "トニック系",
+        next: "E / F# / G#m",
         mood: "明るい・広がり・透明感"
     },
 
     "Cmadd9": {
         function: "トニック系",
         next: "Fm / G / Ab",
+        mood: "切ない・浮遊感・広がり"
+    },
+    "C#madd9": {
+        function: "トニック系",
+        next: "F#m / G# / A",
+        mood: "切ない・浮遊感・広がり"
+    },
+    "Dmadd9": {
+        function: "トニック系",
+        next: "Gm / A / Bb",
+        mood: "切ない・浮遊感・広がり"
+    },
+    "D#madd9": {
+        function: "トニック系",
+        next: "G#m / A# / B",
+        mood: "切ない・浮遊感・広がり"
+    },
+    "Emadd9": {
+        function: "トニック系",
+        next: "Am / B / C",
+        mood: "切ない・浮遊感・広がり"
+    },
+    "Fmadd9": {
+        function: "トニック系",
+        next: "Bbm / C / Db",
+        mood: "切ない・浮遊感・広がり"
+    },
+    "F#madd9": {
+        function: "トニック系",
+        next: "Bm / C# / D",
+        mood: "切ない・浮遊感・広がり"
+    },
+    "Gmadd9": {
+        function: "トニック系",
+        next: "Cm / D / Eb",
+        mood: "切ない・浮遊感・広がり"
+    },
+    "G#madd9": {
+        function: "トニック系",
+        next: "C#m / D# / E",
+        mood: "切ない・浮遊感・広がり"
+    },
+    "Amadd9": {
+        function: "トニック系",
+        next: "Dm / E / F",
+        mood: "切ない・浮遊感・広がり"
+    },
+    "A#madd9": {
+        function: "トニック系",
+        next: "D#m / F / F#",
+        mood: "切ない・浮遊感・広がり"
+    },
+    "Bmadd9": {
+        function: "トニック系",
+        next: "Em / F# / G",
         mood: "切ない・浮遊感・広がり"
     },
 
@@ -452,5 +672,63 @@ const keyNextChords = {
         "F#m": "Bm / D / Em",
         "G": "A / Bm / D",
         "A": "Bm / D / Em"
+    },
+        "D-minor": {
+        "Dm": "i（トニック）",
+        "Edim": "ii°（サブドミナント系）",
+        "F": "III（トニック系）",
+        "Gm": "iv（サブドミナント）",
+        "Am": "v（ドミナント系）",
+        "Bb": "VI（サブドミナント系）",
+        "C": "VII（ドミナント系）"
+    },
+
+    "G-minor": {
+        "Gm": "i（トニック）",
+        "Adim": "ii°（サブドミナント系）",
+        "Bb": "III（トニック系）",
+        "Cm": "iv（サブドミナント）",
+        "Dm": "v（ドミナント系）",
+        "Eb": "VI（サブドミナント系）",
+        "F": "VII（ドミナント系）"
+    },
+
+    "C-minor": {
+        "Cm": "i（トニック）",
+        "Ddim": "ii°（サブドミナント系）",
+        "Eb": "III（トニック系）",
+        "Fm": "iv（サブドミナント）",
+        "Gm": "v（ドミナント系）",
+        "Ab": "VI（サブドミナント系）",
+        "Bb": "VII（ドミナント系）"
+    },
+        "D-minor": {
+        "Dm": "Gm / Bb / C",
+        "Edim": "Gm / Am",
+        "F": "Bb / C / Dm",
+        "Gm": "C / Dm / F",
+        "Am": "Dm / F / Gm",
+        "Bb": "C / Dm / F",
+        "C": "Dm / F / Gm"
+    },
+
+    "G-minor": {
+        "Gm": "Cm / Eb / F",
+        "Adim": "Cm / Dm",
+        "Bb": "Eb / F / Gm",
+        "Cm": "F / Gm / Bb",
+        "Dm": "Gm / Bb / Cm",
+        "Eb": "F / Gm / Bb",
+        "F": "Gm / Bb / Cm"
+    },
+
+    "C-minor": {
+        "Cm": "Fm / Ab / Bb",
+        "Ddim": "Fm / Gm",
+        "Eb": "Ab / Bb / Cm",
+        "Fm": "Bb / Cm / Eb",
+        "Gm": "Cm / Eb / Fm",
+        "Ab": "Bb / Cm / Eb",
+        "Bb": "Cm / Eb / Fm"
     }
 };
