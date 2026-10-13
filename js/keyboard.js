@@ -138,6 +138,66 @@ if (selectedNotes.includes(noteId)) {
     });
 }
 
+function formatChordRole(chord, keyFunction, fallbackFunction) {
+    const noteNumbers = {
+        C: 0, "C#": 1, D: 2, "D#": 3,
+        E: 4, F: 5, "F#": 6, G: 7,
+        "G#": 8, A: 9, "A#": 10, B: 11
+    };
+
+    const keyParts = currentKey.split("-");
+    const tonic = keyParts[0];
+    const isMinor = keyParts[1] === "minor";
+
+    const majorScale = [0, 2, 4, 5, 7, 9, 11];
+    const minorScale = [0, 2, 3, 5, 7, 8, 10];
+    const scale = isMinor ? minorScale : majorScale;
+
+    const romanNumerals = [
+        "Ⅰ", "Ⅱ", "Ⅲ", "Ⅳ", "Ⅴ", "Ⅵ", "Ⅶ"
+    ];
+
+    const rootNumber = noteNumbers[chord.root];
+    const tonicNumber = noteNumbers[tonic];
+
+    let degree = "";
+
+    if (rootNumber !== undefined && tonicNumber !== undefined) {
+        const interval = (rootNumber - tonicNumber + 12) % 12;
+        let index = scale.indexOf(interval);
+
+        if (index !== -1) {
+            degree = romanNumerals[index];
+        } else {
+            const nearest = scale.reduce((best, value, i) => {
+                const distance = Math.min(
+                    (interval - value + 12) % 12,
+                    (value - interval + 12) % 12
+                );
+
+                return distance < best.distance
+                    ? { index: i, distance }
+                    : best;
+            }, { index: 0, distance: 12 });
+
+            degree = romanNumerals[nearest.index];
+        }
+    }
+
+    const quality = chord.name
+        .slice(chord.root.length)
+        .replace(/\/[A-G]#?$/, "");
+
+    const roleMatch = keyFunction
+        ? keyFunction.match(/（(.+?)）/)
+        : null;
+
+    const role = roleMatch
+        ? roleMatch[1]
+        : fallbackFunction || "役割不明";
+
+    return degree + quality + "（" + role + "）";
+}
 
 // コード表示を更新
 function updateChordDisplay() {
@@ -215,13 +275,11 @@ notesDisplay.textContent =
         const keyFunction =
             keyInfo && keyInfo[chord.name];
 
-        if (keyFunction) {
-            functionDisplay.textContent =
-                keyFunction;
-        } else {
-            functionDisplay.textContent =
-                information.function;
-        }
+       functionDisplay.textContent = formatChordRole(
+    chord,
+    keyFunction,
+    information.function
+);
 
         const keyNext =
             keyNextChords[currentKey];
