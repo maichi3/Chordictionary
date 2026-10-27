@@ -241,6 +241,42 @@ chordDatabase["C/D"] = {
     mood: "浮遊感・緊張感"
 };
 
+
+const extendedChordInfo = [
+    ["dim7", "ドミナント系", "不安・強い緊張感"],
+    ["aug7", "ドミナント系", "不安定・ブルージー"],
+    ["7sus4", "ドミナント系", "開放感・緊張感"],
+    ["add11", "トニック系", "広がり・透明感"],
+    ["madd11", "トニック系", "柔らかい・浮遊感"],
+    ["add13", "トニック系", "明るい・豊かな響き"],
+    ["9", "ドミナント系", "華やか・ブルージー"],
+    ["maj9", "トニック系", "おしゃれ・透明感"],
+    ["m9", "トニック系", "切ない・柔らかい"],
+    ["mMaj9", "トニック系", "暗い・複雑な響き"],
+    ["7♭9", "ドミナント系", "緊張感・不穏"],
+    ["7♯9", "ドミナント系", "ブルージー・刺激的"],
+    ["11", "ドミナント系", "広がり・浮遊感"],
+    ["m11", "トニック系", "柔らかい・落ち着き"],
+    ["13", "ドミナント系", "華やか・豊かな響き"],
+    ["maj13", "トニック系", "明るい・洗練された響き"],
+    ["m13", "トニック系", "深い・落ち着いた響き"]
+];
+
+for (const root of noteNames) {
+    for (const [suffix, func, mood] of extendedChordInfo) {
+        const name = root + suffix;
+
+        if (!chordDatabase[name]) {
+            chordDatabase[name] = {
+                function: func,
+                next: "キーに応じた候補を確認してください",
+                mood
+            };
+        }
+    }
+}
+
+
 let currentKey = "C-major";
 
 const keySelect = document.getElementById("key-select");
