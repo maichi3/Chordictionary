@@ -317,4 +317,22 @@ notesDisplay.textContent =
     moodDisplay.textContent =
         "---";
 }
+// リセットボタン
+const resetButton = document.getElementById("reset-button");
+
+if (resetButton) {
+    resetButton.addEventListener("click", () => {
+
+        // 選択した音をすべて解除
+        selectedNotes = [];
+
+        // 鍵盤の選択色を解除
+        document.querySelectorAll(".piano-key.selected").forEach(key => {
+            key.classList.remove("selected");
+        });
+
+        // コード表示を初期状態に戻す
+        updateChordDisplay();
+    });
+}
 }
