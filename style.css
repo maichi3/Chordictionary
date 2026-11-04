@@ -17,7 +17,7 @@ header {
 
 header h1 {
     margin: 0;
-    font-size: 32px;
+    font-size: 80px;
 }
 
 header p {
@@ -171,7 +171,6 @@ button {
     margin: 12px 0;
 }
 
-
 /* =========================
    スマートフォン対応
 ========================= */
@@ -202,5 +201,62 @@ button {
     .piano-key.black {
         width: 42px;
         height: 115px;
+    }
+}
+
+
+/* =========================
+   機能説明と操作画面
+========================= */
+
+/* =========================
+   機能説明と操作画面
+========================= */
+
+/* 機能説明と操作画面 */
+.feature-layout {
+    display: grid;
+    grid-template-columns: 300px minmax(0, 1fr);
+    gap: 46px;
+
+    width: calc(100% + 346px);
+    margin-left: -346px;
+
+    align-items: stretch;
+}
+
+/* 左側の説明カード */
+.feature-description {
+    min-width: 0;
+}
+
+.feature-description p {
+    line-height: 1.8;
+}
+
+/* 右側の楽器カード */
+.feature-controls {
+    width: 100%;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.feature-controls h2 {
+    margin-top: 0;
+}
+
+/* スマートフォン */
+@media (max-width: 700px) {
+    .feature-layout {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        margin-left: 0;
+        gap: 20px;
+    }
+
+    .feature-description,
+    .feature-controls {
+        width: 100%;
     }
 }
