@@ -260,3 +260,99 @@ button {
         width: 100%;
     }
 }
+
+/* =========================
+   楽器切り替え
+========================= */
+
+.instrument-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.instrument-tab {
+    flex: 1;
+    padding: 12px;
+    border-radius: 8px;
+    background: #eeeeee;
+    color: #333;
+    transition: background 0.2s;
+}
+
+.instrument-tab:hover {
+    background: #dddddd;
+}
+
+.instrument-tab.active {
+    background: #222;
+    color: white;
+}
+
+.instrument-panel[hidden] {
+    display: none;
+}
+
+.instrument-panel h2 {
+    margin-top: 0;
+}
+
+#reset-button {
+    margin-top: 20px;
+    padding: 12px 20px;
+    border-radius: 8px;
+    background: #e5e5e5;
+    color: #222;
+}
+
+#reset-button:hover {
+    background: #d5d5d5;
+}
+
+/* ギター指板 */
+
+#guitar {
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 12px;
+}
+
+.guitar-string-row {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    min-width: 850px;
+    margin-bottom: 8px;
+}
+
+.guitar-string-label {
+    width: 65px;
+    flex-shrink: 0;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.guitar-note {
+    width: 48px;
+    height: 42px;
+    flex-shrink: 0;
+    border: 1px solid #bbb;
+    border-radius: 5px;
+    background: #f5f5f5;
+    color: #222;
+    font-size: 13px;
+}
+
+.guitar-note:hover {
+    background: #ddd;
+}
+
+.guitar-note.selected {
+    background: #333;
+    color: white;
+    border-color: #333;
+}
+
+.guitar-note.open-string {
+    border-color: #888;
+}

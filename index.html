@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -33,25 +34,26 @@
         </p>
     </section>
 
+    <!-- キー -->
     <section class="card">
-    <h2>🎼 キー</h2>
+        <h2>🎼 キー</h2>
 
-   <label for="key-select">キー：</label>
-<select id="key-select">
-    <option value="C-major">C</option>
-    <option value="C#-major">C♯</option>
-    <option value="D-major">D</option>
-    <option value="D#-major">D♯</option>
-    <option value="E-major">E</option>
-    <option value="F-major">F</option>
-    <option value="F#-major">F♯</option>
-    <option value="G-major">G</option>
-    <option value="G#-major">G♯</option>
-    <option value="A-major">A</option>
-    <option value="A#-major">A♯</option>
-    <option value="B-major">B</option>
-</select>
-</section>
+        <label for="key-select">キー：</label>
+        <select id="key-select">
+            <option value="C-major">C</option>
+            <option value="C#-major">C♯</option>
+            <option value="D-major">D</option>
+            <option value="D#-major">D♯</option>
+            <option value="E-major">E</option>
+            <option value="F-major">F</option>
+            <option value="F#-major">F♯</option>
+            <option value="G-major">G</option>
+            <option value="G#-major">G♯</option>
+            <option value="A-major">A</option>
+            <option value="A#-major">A♯</option>
+            <option value="B-major">B</option>
+        </select>
+    </section>
 
     <!-- コード表示 -->
     <section class="card">
@@ -65,42 +67,88 @@
     </section>
 
     <!-- 説明カードと楽器カード -->
-<div class="feature-layout">
+    <div class="feature-layout">
 
-    <!-- 左側：説明カード -->
-    <section class="card feature-description">
-        <h2>🎹🎸 音の入力方法</h2>
+        <!-- 左側：説明カード -->
+        <section class="card feature-description">
+            <h2>🎹🎸 音の入力方法</h2>
 
-        <p>
-            鍵盤やギターで音を選択して、
-            コードを調べることができます。
-        </p>
+            <p>
+                鍵盤やギターで音を選択して、
+                コードを調べることができます。
+            </p>
 
-        <p>
-            鍵盤では3つ以上の音を選ぶと、
-            コードが判定されます。
-        </p>
+            <p>
+                複数の楽器で選択した音を組み合わせて、
+                コードを判定できます。
+            </p>
 
-        <p>
-            選択した音は、もう一度クリックすると
-            解除できます。
-        </p>
-    </section>
+            <p>
+                選択した音は、楽器を切り替えても
+                保存されます。
+            </p>
 
-    <!-- 右側：既存の楽器カード -->
-    <section class="card feature-controls">
-        <h2>🎹 Keyboard</h2>
-        <div id="keyboard"></div>
+            <p>
+                選択した音をもう一度クリックすると、
+                解除できます。
+            </p>
+        </section>
 
-        <h2>🎸 Guitar</h2>
-        <div id="guitar"></div>
+        <!-- 右側：楽器カード -->
+        <section class="card feature-controls">
 
-        <button id="reset-button" type="button">
-            選択をリセット
-        </button>
-    </section>
+            <h2>楽器を選択</h2>
 
-</div>
+            <!-- 楽器切り替えボタン -->
+            <div class="instrument-tabs">
+                <button
+                    type="button"
+                    id="keyboard-tab"
+                    class="instrument-tab active"
+                    data-instrument="keyboard"
+                    aria-pressed="true"
+                >
+                    🎹 Keyboard
+                </button>
+
+                <button
+                    type="button"
+                    id="guitar-tab"
+                    class="instrument-tab"
+                    data-instrument="guitar"
+                    aria-pressed="false"
+                >
+                    🎸 Guitar
+                </button>
+            </div>
+
+            <!-- 鍵盤 -->
+            <div
+                id="keyboard-panel"
+                class="instrument-panel"
+            >
+                <h2>🎹 Keyboard</h2>
+                <div id="keyboard"></div>
+            </div>
+
+            <!-- ギター -->
+            <div
+                id="guitar-panel"
+                class="instrument-panel"
+                hidden
+            >
+                <h2>🎸 Guitar</h2>
+                <div id="guitar"></div>
+            </div>
+
+            <!-- リセット -->
+            <button id="reset-button" type="button">
+                選択をリセット
+            </button>
+
+        </section>
+
+    </div>
 
     <!-- コード情報 -->
     <section class="card">

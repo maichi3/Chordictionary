@@ -1,4 +1,6 @@
+
 console.log(keyNextChords);
+
 const notes = [
     { name: "C", type: "white", frequency: 261.63 },
     { name: "C#", type: "black", position: 0, frequency: 277.18 },
@@ -16,12 +18,20 @@ const notes = [
 
 const keyboard = document.getElementById("keyboard");
 
-let selectedNotes = [];
+const keyboardNotes = [];
+const guitarNotes = [];
+
+let selectedInstrument = "keyboard";
 
 let audioContext = null;
 
-function playNote(frequency) {
+// すべての楽器の選択音をまとめる
+function getAllSelectedNotes() {
+    return [...keyboardNotes, ...guitarNotes];
+}
 
+// 音を鳴らす
+function playNote(frequency) {
     if (!audioContext) {
         audioContext = new (
             window.AudioContext ||
@@ -33,11 +43,8 @@ function playNote(frequency) {
         audioContext.resume();
     }
 
-    const oscillator =
-        audioContext.createOscillator();
-
-    const gainNode =
-        audioContext.createGain();
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
 
     oscillator.type = "triangle";
 
@@ -60,29 +67,37 @@ function playNote(frequency) {
     gainNode.connect(audioContext.destination);
 
     oscillator.start();
-
-    oscillator.stop(
-        audioContext.currentTime + 1
-    );
+    oscillator.stop(audioContext.currentTime + 1);
 }
 
+// 鍵盤の選択状態を復元する
+function restoreKeyboardSelection() {
+    document.querySelectorAll(".piano-key").forEach(key => {
+        const octave = key.dataset.octave;
+        const noteName = key.dataset.note;
+        const noteId = octave + "-" + noteName;
+
+        key.classList.toggle(
+            "selected",
+            keyboardNotes.includes(noteId)
+        );
+    });
+}
 
 // 2オクターブの鍵盤を作る
 for (let octave = 0; octave < 2; octave++) {
-
     notes.forEach(note => {
-
         const key = document.createElement("button");
 
+        key.type = "button";
         key.textContent = note.name;
 
-        key.classList.add("piano-key");
-        key.classList.add(note.type);
+        key.classList.add("piano-key", note.type);
 
         key.dataset.note = note.name;
+        key.dataset.octave = octave;
 
         if (note.type === "white") {
-
             const whitePosition =
                 octave * 7 +
                 notes
@@ -90,46 +105,30 @@ for (let octave = 0; octave < 2; octave++) {
                     .filter(n => n.type === "white")
                     .length - 1;
 
-            key.style.left =
-                (whitePosition * 80) + "px";
-
+            key.style.left = (whitePosition * 80) + "px";
         } else {
-
             key.style.left =
                 ((octave * 7 + note.position + 1) * 80 - 25) + "px";
         }
 
-
-        // 鍵盤をクリック
         key.addEventListener("click", () => {
-
-            // ★ 2オクターブ目は周波数を2倍
             const frequency =
                 octave === 0
                     ? note.frequency
                     : note.frequency * 2;
 
-            // 音を鳴らす
             playNote(frequency);
 
-           const noteName = note.name;
-const noteId = octave + "-" + note.name;
+            const noteId = octave + "-" + note.name;
 
-// 選択・解除
-if (selectedNotes.includes(noteId)) {
-
-    selectedNotes = selectedNotes.filter(
-        selected => selected !== noteId
-    );
-
-    key.classList.remove("selected");
-
-} else {
-
-    selectedNotes.push(noteId);
-
-    key.classList.add("selected");
-}
+            if (keyboardNotes.includes(noteId)) {
+                const index = keyboardNotes.indexOf(noteId);
+                keyboardNotes.splice(index, 1);
+                key.classList.remove("selected");
+            } else {
+                keyboardNotes.push(noteId);
+                key.classList.add("selected");
+            }
 
             updateChordDisplay();
         });
@@ -138,13 +137,44 @@ if (selectedNotes.includes(noteId)) {
     });
 }
 
-function formatChordRole(chord, keyFunction, fallbackFunction) {
-    const noteNumbers = {
-        C: 0, "C#": 1, D: 2, "D#": 3,
-        E: 4, F: 5, "F#": 6, G: 7,
-        "G#": 8, A: 9, "A#": 10, B: 11
-    };
+// 楽器の切り替え
+const keyboardTab = document.getElementById("keyboard-tab");
+const guitarTab = document.getElementById("guitar-tab");
 
+const keyboardPanel = document.getElementById("keyboard-panel");
+const guitarPanel = document.getElementById("guitar-panel");
+
+function switchInstrument(instrument) {
+    selectedInstrument = instrument;
+
+    const isKeyboard = instrument === "keyboard";
+
+    keyboardPanel.hidden = !isKeyboard;
+    guitarPanel.hidden = isKeyboard;
+
+    keyboardTab.classList.toggle("active", isKeyboard);
+    guitarTab.classList.toggle("active", !isKeyboard);
+
+    keyboardTab.setAttribute("aria-pressed", String(isKeyboard));
+    guitarTab.setAttribute("aria-pressed", String(!isKeyboard));
+
+    if (isKeyboard) {
+        restoreKeyboardSelection();
+    } else {
+        restoreGuitarSelection();
+    }
+}
+
+keyboardTab.addEventListener("click", () => {
+    switchInstrument("keyboard");
+});
+
+guitarTab.addEventListener("click", () => {
+    switchInstrument("guitar");
+});
+
+// コード表示用の役割表記
+function formatChordRole(chord, keyFunction, fallbackFunction) {
     const keyParts = currentKey.split("-");
     const tonic = keyParts[0];
     const isMinor = keyParts[1] === "minor";
@@ -201,138 +231,169 @@ function formatChordRole(chord, keyFunction, fallbackFunction) {
 
 // コード表示を更新
 function updateChordDisplay() {
+    const chordName = document.getElementById("chord-name");
+    const notesDisplay = document.getElementById("notes");
+    const functionDisplay = document.getElementById("function");
+    const nextChordsDisplay = document.getElementById("next-chords");
+    const moodDisplay = document.getElementById("mood");
 
-    const chordName =
-        document.getElementById("chord-name");
-
-    const notesDisplay =
-        document.getElementById("notes");
-
-    const functionDisplay =
-        document.getElementById("function");
-
-    const nextChordsDisplay =
-        document.getElementById("next-chords");
-
-    const moodDisplay =
-        document.getElementById("mood");
-
+    const selectedNotes = getAllSelectedNotes();
 
     if (selectedNotes.length === 0) {
-
         chordName.textContent = "---";
-
-        notesDisplay.textContent =
-            "構成音：---";
-
+        notesDisplay.textContent = "構成音：---";
         functionDisplay.textContent = "---";
-
         nextChordsDisplay.textContent = "---";
-
         moodDisplay.textContent = "---";
-
         return;
     }
 
+    const chord = detectChord(selectedNotes);
 
-  const noteNames = [
-    ...new Set(
-        selectedNotes.map(note => note.split("-")[1])
-    )
-];
+    const sortedNotes = [...selectedNotes].sort((a, b) => {
+        const [octaveA, noteA] = a.split("-");
+        const [octaveB, noteB] = b.split("-");
 
-const chord =
-    detectChord(selectedNotes);
+        const valueA =
+            Number(octaveA) * 12 + noteNumbers[noteA];
 
-   const sortedNotes = [...selectedNotes].sort((a, b) => {
-    const [octaveA, noteA] = a.split("-");
-    const [octaveB, noteB] = b.split("-");
+        const valueB =
+            Number(octaveB) * 12 + noteNumbers[noteB];
 
-    const valueA = Number(octaveA) * 12 + noteNumbers[noteA];
-    const valueB = Number(octaveB) * 12 + noteNumbers[noteB];
+        return valueA - valueB;
+    });
 
-    return valueA - valueB;
-});
+    notesDisplay.textContent =
+        "構成音：" +
+        sortedNotes
+            .map(note => note.split("-")[1])
+            .join(" - ");
 
-notesDisplay.textContent =
-    "構成音：" +
-    sortedNotes
-        .map(note => note.split("-")[1])
-        .join(" - ");
-        
-   if (chord) {
-    chordName.textContent =
-        chord.name;
+    if (chord) {
+        chordName.textContent = chord.name;
 
-    const information =
-        chordDatabase[chord.name];
+        const information = chordDatabase[chord.name];
 
-    if (information) {
+        if (information) {
+            const keyInfo = keyFunctions[currentKey];
+            const keyFunction = keyInfo && keyInfo[chord.name];
 
-        const keyInfo =
-            keyFunctions[currentKey];
+            functionDisplay.textContent = formatChordRole(
+                chord,
+                keyFunction,
+                information.function
+            );
 
-        const keyFunction =
-            keyInfo && keyInfo[chord.name];
+            const keyNext = keyNextChords[currentKey];
+            const nextChords = keyNext && keyNext[chord.name];
 
-       functionDisplay.textContent = formatChordRole(
-    chord,
-    keyFunction,
-    information.function
-);
+            nextChordsDisplay.textContent =
+                nextChords || information.next;
 
-        const keyNext =
-            keyNextChords[currentKey];
-
-        const nextChords =
-            keyNext && keyNext[chord.name];
-
-        nextChordsDisplay.textContent =
-            nextChords || information.next;
-
-        moodDisplay.textContent =
-            information.mood;
-
+            moodDisplay.textContent = information.mood;
+        } else {
+            functionDisplay.textContent = "情報なし";
+            nextChordsDisplay.textContent = "情報なし";
+            moodDisplay.textContent = "情報なし";
+        }
     } else {
-        functionDisplay.textContent =
-            "情報なし";
-
-        nextChordsDisplay.textContent =
-            "情報なし";
-
-        moodDisplay.textContent =
-            "情報なし";
+        chordName.textContent = "判定できません";
+        functionDisplay.textContent = "---";
+        nextChordsDisplay.textContent = "---";
+        moodDisplay.textContent = "---";
     }
-
-} else {
-    chordName.textContent =
-        "判定できません";
-
-    functionDisplay.textContent =
-        "---";
-
-    nextChordsDisplay.textContent =
-        "---";
-
-    moodDisplay.textContent =
-        "---";
 }
-// リセットボタン
+
+// リセット
 const resetButton = document.getElementById("reset-button");
 
-if (resetButton) {
-    resetButton.addEventListener("click", () => {
+resetButton.addEventListener("click", () => {
+    keyboardNotes.length = 0;
+    guitarNotes.length = 0;
 
-        // 選択した音をすべて解除
-        selectedNotes = [];
+    document.querySelectorAll(".selected").forEach(key => {
+        key.classList.remove("selected");
+    });
 
-        // 鍵盤の選択色を解除
-        document.querySelectorAll(".piano-key.selected").forEach(key => {
-            key.classList.remove("selected");
-        });
+    updateChordDisplay();
+});
 
-        // コード表示を初期状態に戻す
-        updateChordDisplay();
+// ギターの選択状態復元用
+
+// ギターの指板を作成
+const guitar = document.getElementById("guitar");
+
+const guitarStrings = [
+    { name: "6弦 E", value: -8 },
+    { name: "5弦 A", value: -3 },
+    { name: "4弦 D", value: 2 },
+    { name: "3弦 G", value: 7 },
+    { name: "2弦 B", value: 11 },
+    { name: "1弦 E", value: 16 }
+];
+
+const chromaticNotes = [
+    "C", "C#", "D", "D#", "E", "F",
+    "F#", "G", "G#", "A", "A#", "B"
+];
+
+function restoreGuitarSelection() {
+    document.querySelectorAll(".guitar-note").forEach(button => {
+        button.classList.toggle(
+            "selected",
+            guitarNotes.includes(button.dataset.noteId)
+        );
     });
 }
-}
+
+guitarStrings.forEach(string => {
+    const row = document.createElement("div");
+    row.className = "guitar-string-row";
+
+    const label = document.createElement("span");
+    label.className = "guitar-string-label";
+    label.textContent = string.name;
+
+    row.appendChild(label);
+
+    for (let fret = 0; fret <= 12; fret++) {
+        const value = string.value + fret;
+
+        const octave = Math.floor(value / 12);
+        const noteName = chromaticNotes[
+            ((value % 12) + 12) % 12
+        ];
+
+        const noteId = octave + "-" + noteName;
+
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "guitar-note";
+        button.textContent = noteName;
+        button.dataset.noteId = noteId;
+
+        if (fret === 0) {
+            button.classList.add("open-string");
+        }
+
+        button.addEventListener("click", () => {
+            if (guitarNotes.includes(noteId)) {
+                const index = guitarNotes.indexOf(noteId);
+                guitarNotes.splice(index, 1);
+                button.classList.remove("selected");
+            } else {
+                guitarNotes.push(noteId);
+                button.classList.add("selected");
+            }
+
+            updateChordDisplay();
+        });
+
+        row.appendChild(button);
+    }
+
+    guitar.appendChild(row);
+});
+
+restoreGuitarSelection();
+updateChordDisplay();
