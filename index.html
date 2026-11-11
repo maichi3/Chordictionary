@@ -26,12 +26,13 @@
         <input
             type="file"
             id="audio-file"
-            accept="audio/*"
+            accept=".mp3,audio/mpeg"
         >
 
         <p id="audio-status">
             音声ファイルを選択してください。
         </p>
+        <div id="audio-results" aria-live="polite"></div>
     </section>
 
     <!-- キー -->
@@ -179,6 +180,7 @@
 <script src="js/chordDetector.js"></script>
 <script src="js/chordDatabase.js"></script>
 <script src="js/keyboard.js"></script>
+<script src="js/audioAnalyzer.js"></script>
 
 </body>
 </html>
