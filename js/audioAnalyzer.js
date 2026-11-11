@@ -116,15 +116,15 @@ function analyzeAudioBuffer(audioBuffer) {
         });
     }
 
-    return mergeChordFrames(frames);
+    return mergeChordFrames(frames, audioBuffer.sampleRate);
 }
 
-function mergeChordFrames(frames) {
+function mergeChordFrames(frames, sampleRate) {
     const groups = [];
     const windowCount = Math.max(
         1,
         Math.round(ANALYSIS_WINDOW_SECONDS /
-            (ANALYSIS_HOP_SIZE / 44100))
+            (ANALYSIS_HOP_SIZE / sampleRate))
     );
 
     for (let i = 0; i < frames.length; i += windowCount) {
