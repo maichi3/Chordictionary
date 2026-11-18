@@ -356,3 +356,25 @@ button {
 .guitar-note.open-string {
     border-color: #888;
 }
+
+
+/* 音声解析結果 */
+#audio-results {
+    margin-top: 16px;
+}
+
+.audio-chord-list {
+    padding-left: 24px;
+}
+
+.audio-chord-list li {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 10px 12px;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.audio-chord-list strong {
+    font-size: 18px;
+}
