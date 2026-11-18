@@ -240,7 +240,9 @@ function parseAnalyzedChord(chordName) {
     const parts = chordName.split("/");
     const baseName = parts[0];
     const bassName = parts[1] || null;
-    const root = noteNamesForDisplay.find(note => baseName.startsWith(note));
+    const root = [...noteNamesForDisplay]
+        .sort((a, b) => b.length - a.length)
+        .find(note => baseName.startsWith(note));
 
     if (!root) return null;
 
