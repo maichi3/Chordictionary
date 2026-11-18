@@ -28,7 +28,10 @@ let audioContext = null;
 
 // すべての楽器の選択音をまとめる
 function getAllSelectedNotes() {
-    return [...keyboardNotes, ...guitarNotes];
+    // 手入力の判定は、現在選択している楽器の音だけを使う
+    return selectedInstrument === "keyboard"
+        ? [...keyboardNotes]
+        : [...guitarNotes];
 }
 
 // 音を鳴らす
@@ -78,9 +81,10 @@ function restoreKeyboardSelection() {
         const noteName = key.dataset.note;
         const noteId = octave + "-" + noteName;
 
+        key.classList.toggle("selected", keyboardNotes.includes(noteId));
         key.classList.toggle(
-            "selected",
-            keyboardNotes.includes(noteId)
+            "audio-highlight",
+            Boolean(audioSelectedChord && audioSelectedChord.notes.includes(noteName))
         );
     });
 }
@@ -136,6 +140,8 @@ for (let octave = 0; octave < 2; octave++) {
                 key.classList.add("selected");
             }
 
+            restoreKeyboardSelection();
+            restoreGuitarSelection();
             updateChordDisplay();
         });
 
@@ -164,11 +170,9 @@ function switchInstrument(instrument) {
     keyboardTab.setAttribute("aria-pressed", String(isKeyboard));
     guitarTab.setAttribute("aria-pressed", String(!isKeyboard));
 
-    if (isKeyboard) {
-        restoreKeyboardSelection();
-    } else {
-        restoreGuitarSelection();
-    }
+    // 手入力状態と音声解析のハイライトをそれぞれ保持
+    restoreKeyboardSelection();
+    restoreGuitarSelection();
 }
 
 keyboardTab.addEventListener("click", () => {
@@ -273,22 +277,8 @@ function selectAnalyzedChord(chordName) {
     const chord = parseAnalyzedChord(chordName);
     if (!chord) return;
 
+    // 音声解析で選択したコードは、手入力の状態とは分離して保持する
     audioSelectedChord = chord;
-    keyboardNotes.length = 0;
-    guitarNotes.length = 0;
-
-    // 鍵盤は2オクターブ両方に構成音を表示する
-    for (let octave = 0; octave < 2; octave++) {
-        chord.notes.forEach(note => keyboardNotes.push(octave + "-" + note));
-    }
-
-    // ギター指板では、構成音に該当するポジションをすべて表示する
-    document.querySelectorAll(".guitar-note").forEach(button => {
-        const noteName = button.dataset.noteId.split("-")[1];
-        if (chord.notes.includes(noteName)) {
-            guitarNotes.push(button.dataset.noteId);
-        }
-    });
 
     restoreKeyboardSelection();
     restoreGuitarSelection();
@@ -453,8 +443,8 @@ resetButton.addEventListener("click", () => {
         button.classList.remove("active");
     });
 
-    document.querySelectorAll(".selected").forEach(key => {
-        key.classList.remove("selected");
+    document.querySelectorAll(".selected, .audio-highlight").forEach(key => {
+        key.classList.remove("selected", "audio-highlight");
     });
 
     updateChordDisplay();
@@ -481,9 +471,11 @@ const chromaticNotes = [
 
 function restoreGuitarSelection() {
     document.querySelectorAll(".guitar-note").forEach(button => {
+        const noteName = button.dataset.noteId.split("-")[1];
+        button.classList.toggle("selected", guitarNotes.includes(button.dataset.noteId));
         button.classList.toggle(
-            "selected",
-            guitarNotes.includes(button.dataset.noteId)
+            "audio-highlight",
+            Boolean(audioSelectedChord && audioSelectedChord.notes.includes(noteName))
         );
     });
 }
@@ -533,6 +525,8 @@ guitarStrings.forEach(string => {
                 button.classList.add("selected");
             }
 
+            restoreKeyboardSelection();
+            restoreGuitarSelection();
             updateChordDisplay();
         });
 

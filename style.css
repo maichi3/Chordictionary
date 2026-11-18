@@ -120,7 +120,8 @@ button {
 }
 
 
-.piano-key.white.selected {
+.piano-key.white.selected,
+.piano-key.white.audio-highlight {
     background: #c9ddff;
 }
 
@@ -158,7 +159,8 @@ button {
 }
 
 
-.piano-key.black.selected {
+.piano-key.black.selected,
+.piano-key.black.audio-highlight {
     background: #4d8cff;
 }
 
@@ -347,7 +349,8 @@ button {
     background: #ddd;
 }
 
-.guitar-note.selected {
+.guitar-note.selected,
+.guitar-note.audio-highlight {
     background: #333;
     color: white;
     border-color: #333;
