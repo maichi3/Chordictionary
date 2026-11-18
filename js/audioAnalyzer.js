@@ -5,10 +5,10 @@ const audioFileInput = document.getElementById("audio-file");
 const audioStatus = document.getElementById("audio-status");
 const audioResults = document.getElementById("audio-results");
 
-const ANALYSIS_FRAME_SIZE = 4096;
+const ANALYSIS_FRAME_SIZE = 8192;
 const ANALYSIS_HOP_SIZE = 4096;
-const ANALYSIS_WINDOW_SECONDS = 0.8;
-const MIN_CHORD_CONFIDENCE = 0.16;
+const ANALYSIS_WINDOW_SECONDS = 1.0;
+const MIN_CHORD_CONFIDENCE = 0.18;
 
 function goertzelMagnitude(samples, frequency, sampleRate) {
     const omega = 2 * Math.PI * frequency / sampleRate;
@@ -31,6 +31,14 @@ function goertzelMagnitude(samples, frequency, sampleRate) {
 
 function getFrameChroma(samples, sampleRate) {
     const chroma = Array(12).fill(0);
+    // Hann窓でフレーム端の不連続による周波数漏れを抑える
+    const windowed = new Float32Array(samples.length);
+    for (let i = 0; i < samples.length; i++) {
+        const hann = 0.5 - 0.5 * Math.cos(
+            2 * Math.PI * i / Math.max(1, samples.length - 1)
+        );
+        windowed[i] = samples[i] * hann;
+    }
     const firstMidi = 36;
     const lastMidi = 84;
 
@@ -38,9 +46,11 @@ function getFrameChroma(samples, sampleRate) {
         const frequency = 440 * Math.pow(2, (midi - 69) / 12);
         if (frequency * 2 >= sampleRate / 2) continue;
 
-        const fundamental = goertzelMagnitude(samples, frequency, sampleRate);
-        const secondHarmonic = goertzelMagnitude(samples, frequency * 2, sampleRate);
-        const energy = fundamental + secondHarmonic * 0.35;
+        const fundamental = goertzelMagnitude(windowed, frequency, sampleRate);
+        const secondHarmonic = goertzelMagnitude(windowed, frequency * 2, sampleRate);
+        // 低音域はルート判定に重要なため少し重みを付ける
+        const registerWeight = midi <= 52 ? 1.45 : 1.0;
+        const energy = (fundamental + secondHarmonic * 0.2) * registerWeight;
         chroma[midi % 12] += energy;
     }
 
@@ -69,7 +79,9 @@ function estimateChord(chroma) {
                 0
             ) / Math.max(1, 12 - chordPitchClasses.length);
 
-            const score = inChord - outOfChord * 0.55;
+            const rootStrength = chroma[root];
+            const score = inChord - outOfChord * 0.65 + rootStrength * 0.12
+                + pattern.intervals.length * 0.003;
             candidates.push({ root, pattern, score });
         }
     }
@@ -139,17 +151,20 @@ function mergeChordFrames(frames, sampleRate) {
         const [name, count] = [...counts.entries()]
             .sort((a, b) => b[1] - a[1])[0];
 
+        // 判定が割れている区間は無理に別コードとして表示しない
+        if (name === "判定できません" || count < Math.ceil(slice.length * 0.6)) {
+            continue;
+        }
+
         const start = slice[0].time;
         const end = slice[slice.length - 1].time +
             ANALYSIS_HOP_SIZE / sampleRate;
 
-        if (name !== "判定できません") {
-            const previous = groups[groups.length - 1];
-            if (previous && previous.name === name) {
-                previous.end = end;
-            } else {
-                groups.push({ name, start, end });
-            }
+        const previous = groups[groups.length - 1];
+        if (previous && previous.name === name) {
+            previous.end = end;
+        } else {
+            groups.push({ name, start, end });
         }
     }
 
@@ -193,8 +208,8 @@ function showAudioResults(groups) {
             });
             chord.classList.add("active");
 
-            if (typeof selectAnalyzedChord === "function") {
-                selectAnalyzedChord(group.name);
+            if (typeof window.selectAnalyzedChord === "function") {
+                window.selectAnalyzedChord(group.name);
             }
         });
 
