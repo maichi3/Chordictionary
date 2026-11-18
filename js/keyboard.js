@@ -295,6 +295,9 @@ function selectAnalyzedChord(chordName) {
     updateChordDisplay();
 }
 
+// 別ファイル（音声解析）から確実に呼び出せるよう公開
+window.selectAnalyzedChord = selectAnalyzedChord;
+
 function playSelectedChord() {
     const chord = audioSelectedChord ||
         parseAnalyzedChord(
@@ -317,6 +320,12 @@ function playSelectedChord() {
     const notesToPlay = chord.intervals.map(interval =>
         48 + ((noteNumbers[chord.root] + interval) % 12)
     );
+
+    // 分数コードの場合はベース音も加える
+    if (chord.bass && chord.bass !== chord.root) {
+        const bassMidi = 36 + noteNumbers[chord.bass];
+        if (!notesToPlay.includes(bassMidi)) notesToPlay.unshift(bassMidi);
+    }
 
     notesToPlay.forEach(midiNote => {
         const oscillator = audioContext.createOscillator();
@@ -364,12 +373,12 @@ function updateChordDisplay() {
         functionDisplay.textContent = "---";
         nextChordsDisplay.textContent = "---";
         moodDisplay.textContent = "---";
-        if (playChordButton) playChordButton.disabled = true;
+        if (playChordButton) playChordButton.disabled = false;
         return;
     }
 
     const chord = audioSelectedChord || detectChord(selectedNotes);
-    if (playChordButton) playChordButton.disabled = !chord;
+    if (playChordButton) playChordButton.disabled = false;
 
     const sortedNotes = [...selectedNotes].sort((a, b) => {
         const [octaveA, noteA] = a.split("-");
