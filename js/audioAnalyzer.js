@@ -141,7 +141,7 @@ function mergeChordFrames(frames, sampleRate) {
 
         const start = slice[0].time;
         const end = slice[slice.length - 1].time +
-            ANALYSIS_HOP_SIZE / 44100;
+            ANALYSIS_HOP_SIZE / sampleRate;
 
         if (name !== "判定できません") {
             const previous = groups[groups.length - 1];
