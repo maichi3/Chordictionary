@@ -378,3 +378,35 @@ button {
 .audio-chord-list strong {
     font-size: 18px;
 }
+
+
+/* 音声解析結果の選択とコード再生 */
+.audio-chord-select {
+    padding: 4px 8px;
+    border-radius: 6px;
+    background: transparent;
+    color: #222;
+    font-weight: bold;
+}
+
+.audio-chord-select:hover {
+    background: #eeeeff;
+}
+
+.audio-chord-select.active {
+    background: #dedcff;
+    outline: 2px solid #8b82d8;
+}
+
+#play-chord-button {
+    margin-top: 14px;
+    padding: 10px 16px;
+    border-radius: 8px;
+    background: #29243f;
+    color: white;
+}
+
+#play-chord-button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
