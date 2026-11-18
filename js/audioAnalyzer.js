@@ -177,12 +177,26 @@ function showAudioResults(groups) {
     groups.forEach(group => {
         const item = document.createElement("li");
         const time = document.createElement("span");
-        const chord = document.createElement("strong");
+        const chord = document.createElement("button");
 
         time.textContent =
             formatAudioTime(group.start) + " – " +
             formatAudioTime(group.end);
+        chord.type = "button";
+        chord.className = "audio-chord-select";
         chord.textContent = group.name;
+        chord.title = "クリックしてコード情報と楽器表示に反映";
+
+        chord.addEventListener("click", () => {
+            document.querySelectorAll(".audio-chord-select").forEach(button => {
+                button.classList.remove("active");
+            });
+            chord.classList.add("active");
+
+            if (typeof selectAnalyzedChord === "function") {
+                selectAnalyzedChord(group.name);
+            }
+        });
 
         item.append(time, chord);
         list.appendChild(item);
