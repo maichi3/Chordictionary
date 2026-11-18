@@ -293,6 +293,8 @@ function selectAnalyzedChord(chordName) {
     restoreKeyboardSelection();
     restoreGuitarSelection();
     updateChordDisplay();
+    const status = document.getElementById("play-chord-status");
+    if (status) status.textContent = chord.name + " を選択中です。再生ボタンで音を確認できます。";
 }
 
 // 別ファイル（音声解析）から確実に呼び出せるよう公開
@@ -303,7 +305,11 @@ function playSelectedChord() {
         parseAnalyzedChord(
             detectChord(getAllSelectedNotes())?.name || ""
         );
-    if (!chord) return;
+    const status = document.getElementById("play-chord-status");
+    if (!chord) {
+        if (status) status.textContent = "先に音声解析のコードをクリックするか、鍵盤・ギターで音を選択してください。";
+        return;
+    }
 
     if (!audioContext) {
         audioContext = new (
@@ -326,6 +332,8 @@ function playSelectedChord() {
         const bassMidi = 36 + noteNumbers[chord.bass];
         if (!notesToPlay.includes(bassMidi)) notesToPlay.unshift(bassMidi);
     }
+
+    if (status) status.textContent = chord.name + " を再生しています。";
 
     notesToPlay.forEach(midiNote => {
         const oscillator = audioContext.createOscillator();
