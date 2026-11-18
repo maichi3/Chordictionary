@@ -140,6 +140,8 @@ for (let octave = 0; octave < 2; octave++) {
                 key.classList.add("selected");
             }
 
+            restoreKeyboardSelection();
+            restoreGuitarSelection();
             updateChordDisplay();
         });
 
@@ -523,6 +525,8 @@ guitarStrings.forEach(string => {
                 button.classList.add("selected");
             }
 
+            restoreKeyboardSelection();
+            restoreGuitarSelection();
             updateChordDisplay();
         });
 
