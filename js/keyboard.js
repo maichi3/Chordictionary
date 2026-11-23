@@ -93,7 +93,11 @@ function restoreKeyboardSelection() {
         key.classList.toggle("selected", keyboardNotes.includes(noteId));
         key.classList.toggle(
             "audio-highlight",
-            Boolean(audioSelectedChord && audioSelectedChord.notes.includes(noteName))
+            Boolean(
+                audioSelectedChord &&
+                Number(octave) === 0 &&
+                audioSelectedChord.notes.includes(noteName)
+            )
         );
     });
 }
@@ -479,12 +483,36 @@ const chromaticNotes = [
 ];
 
 function restoreGuitarSelection() {
+    const highlightedPositions = new Set();
+
+    if (audioSelectedChord) {
+        const usedStrings = new Set();
+
+        // 各構成音につき1か所だけ選び、できるだけ別の弦に分散する
+        audioSelectedChord.notes.forEach(noteName => {
+            const candidates = [...document.querySelectorAll(".guitar-note")]
+                .filter(button => button.dataset.noteId.split("-")[1] === noteName)
+                .sort((a, b) => {
+                    const [stringA, fretA] = a.dataset.positionId.split("-").map(Number);
+                    const [stringB, fretB] = b.dataset.positionId.split("-").map(Number);
+                    const scoreA = fretA + (usedStrings.has(stringA) ? 100 : 0);
+                    const scoreB = fretB + (usedStrings.has(stringB) ? 100 : 0);
+                    return scoreA - scoreB;
+                });
+
+            if (candidates.length > 0) {
+                const chosen = candidates[0];
+                highlightedPositions.add(chosen.dataset.positionId);
+                usedStrings.add(Number(chosen.dataset.positionId.split("-")[0]));
+            }
+        });
+    }
+
     document.querySelectorAll(".guitar-note").forEach(button => {
-        const noteName = button.dataset.noteId.split("-")[1];
         button.classList.toggle("selected", guitarNotes.includes(button.dataset.positionId));
         button.classList.toggle(
             "audio-highlight",
-            Boolean(audioSelectedChord && audioSelectedChord.notes.includes(noteName))
+            highlightedPositions.has(button.dataset.positionId)
         );
     });
 }
@@ -523,6 +551,10 @@ guitarStrings.forEach((string, stringIndex) => {
         }
 
         button.addEventListener("click", () => {
+            // ギターの開放弦E2を基準に、フレット数から実際の音程を計算
+            const guitarFrequency = 82.4069 * Math.pow(2, (value + 8) / 12);
+            playNote(guitarFrequency);
+
             audioSelectedChord = null;
             document.querySelectorAll(".audio-chord-select").forEach(button => {
                 button.classList.remove("active");
