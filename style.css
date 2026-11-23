@@ -238,11 +238,24 @@ button {
 
 .feature-layout {
     display: grid;
-    grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
-    gap: 20px;
-    width: 100%;
+    grid-template-columns: 240px minmax(0, 1fr) 240px;
+    gap: 16px;
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    align-items: stretch;
+}
+
+.feature-layout > .card {
+    height: 100%;
     margin: 0;
-    align-items: start;
+}
+
+.feature-layout > .feature-description { grid-column: 1; }
+.feature-layout > .feature-controls { grid-column: 2; }
+
+.feature-layout::after {
+    content: "";
+    grid-column: 3;
 }
 
 .feature-description,
@@ -295,15 +308,15 @@ button {
 
 /* PC・タブレット：左に説明、中央に楽器、右に同幅の余白 */
 @media (min-width: 701px) {
-    .feature-layout {
-        display: grid;
-        width: 100vw;
-        max-width: none;
-        margin-left: calc(50% - 50vw);
-        grid-template-columns: 240px minmax(0, 1fr) 240px;
-        gap: 16px;
-        align-items: start;
+    .feature-layout { align-items: stretch; }
+
+    /* PC・タブレットでは説明を常時表示 */
+    .feature-description summary {
+        pointer-events: none;
+        cursor: default;
     }
+
+    .feature-description summary::after { content: none; }
 
     .feature-description,
     .feature-controls {
@@ -344,8 +357,26 @@ button {
     .feature-layout {
         display: flex;
         flex-direction: column;
+        width: 100%;
+        margin-left: 0;
         gap: 12px;
     }
+
+    .feature-layout > .card {
+        width: 100%;
+        height: auto;
+    }
+
+    .feature-layout::after { display: none; }
+
+    /* スマホだけ説明カードを折りたためる */
+    .feature-description summary {
+        pointer-events: auto;
+        cursor: pointer;
+    }
+
+    .feature-description summary::after { content: " ＋"; }
+    .feature-description[open] summary::after { content: " −"; }
 
     .feature-controls {
         order: 1;
