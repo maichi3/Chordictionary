@@ -29,9 +29,18 @@ let audioContext = null;
 // すべての楽器の選択音をまとめる
 function getAllSelectedNotes() {
     // 手入力の判定は、現在選択している楽器の音だけを使う
-    return selectedInstrument === "keyboard"
-        ? [...keyboardNotes]
-        : [...guitarNotes];
+    if (selectedInstrument === "keyboard") {
+        return [...keyboardNotes];
+    }
+
+    // ギターは押した位置を個別に保持し、判定にはその位置の音程を渡す
+    return guitarNotes
+        .map(positionId => {
+            const button = [...document.querySelectorAll(".guitar-note")]
+                .find(item => item.dataset.positionId === positionId);
+            return button ? button.dataset.noteId : null;
+        })
+        .filter(Boolean);
 }
 
 // 音を鳴らす
@@ -472,7 +481,7 @@ const chromaticNotes = [
 function restoreGuitarSelection() {
     document.querySelectorAll(".guitar-note").forEach(button => {
         const noteName = button.dataset.noteId.split("-")[1];
-        button.classList.toggle("selected", guitarNotes.includes(button.dataset.noteId));
+        button.classList.toggle("selected", guitarNotes.includes(button.dataset.positionId));
         button.classList.toggle(
             "audio-highlight",
             Boolean(audioSelectedChord && audioSelectedChord.notes.includes(noteName))
@@ -480,7 +489,7 @@ function restoreGuitarSelection() {
     });
 }
 
-guitarStrings.forEach(string => {
+guitarStrings.forEach((string, stringIndex) => {
     const row = document.createElement("div");
     row.className = "guitar-string-row";
 
@@ -505,6 +514,9 @@ guitarStrings.forEach(string => {
         button.className = "guitar-note";
         button.textContent = noteName;
         button.dataset.noteId = noteId;
+        // 同じ音程でも弦・フレットが違えば別の選択位置として扱う
+        const positionId = stringIndex + "-" + fret;
+        button.dataset.positionId = positionId;
 
         if (fret === 0) {
             button.classList.add("open-string");
@@ -516,13 +528,11 @@ guitarStrings.forEach(string => {
                 button.classList.remove("active");
             });
 
-            if (guitarNotes.includes(noteId)) {
-                const index = guitarNotes.indexOf(noteId);
+            if (guitarNotes.includes(positionId)) {
+                const index = guitarNotes.indexOf(positionId);
                 guitarNotes.splice(index, 1);
-                button.classList.remove("selected");
             } else {
-                guitarNotes.push(noteId);
-                button.classList.add("selected");
+                guitarNotes.push(positionId);
             }
 
             restoreKeyboardSelection();
