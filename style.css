@@ -247,6 +247,14 @@ main {
     margin: 0 auto;
 }
 
+/* PC・タブレットでは説明カードだけ画面左端に寄せる */
+@media (min-width: 701px) {
+    .feature-description {
+        position: relative;
+        left: calc((min(1100px, 100vw) - 100vw) / 2 - 20px);
+    }
+}
+
 /* スマートフォンのみ縦並び・説明カードをコンパクトに */
 @media (max-width: 700px) {
     main {
