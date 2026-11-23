@@ -175,6 +175,63 @@ button {
     margin: 12px 0;
 }
 
+/* 各機能の説明と操作カードを横並びにする */
+.explained-feature {
+    display: grid;
+    grid-template-columns: 240px minmax(0, 1fr) 240px;
+    gap: 16px;
+    align-items: stretch;
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    margin-bottom: 20px;
+}
+
+.explained-feature > .card {
+    height: 100%;
+    margin: 0;
+    border-radius: 14px;
+}
+
+.explained-feature > .feature-description {
+    grid-column: 1;
+}
+
+.explained-feature > .card:not(.feature-description) {
+    grid-column: 2;
+}
+
+.explained-feature::after {
+    content: "";
+    grid-column: 3;
+}
+
+.explained-feature .feature-description-content {
+    line-height: 1.7;
+}
+
+@media (max-width: 700px) {
+    .explained-feature {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        margin-left: 0;
+        gap: 10px;
+    }
+
+    .explained-feature > .card {
+        width: 100%;
+        height: auto;
+    }
+
+    .explained-feature > .feature-description {
+        order: 2;
+    }
+
+    .explained-feature > .card:not(.feature-description) {
+        order: 1;
+    }
+}
+
 /* =========================
    機能説明と操作画面
 ========================= */
