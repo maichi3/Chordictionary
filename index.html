@@ -19,8 +19,12 @@
 
 <main>
 
-    <!-- 音声ファイル -->
-    <section class="card">
+<div class="explained-feature">
+        <details class="card feature-description" open>
+            <summary>📘 音声解析の説明</summary>
+            <div class="feature-description-content"><p>音声ファイルを読み込むか、スマホでは録音して、演奏に含まれるコード進行を時間ごとに確認できます。解析結果のコード名を選ぶと、コード情報や鍵盤表示に反映されます。</p></div>
+        </details>
+        <section class="card">
         <h2>🎵 音声解析</h2>
 
         <input
@@ -45,9 +49,14 @@
         </p>
         <div id="audio-results" aria-live="polite"></div>
     </section>
+    </div>
 
-    <!-- キー -->
-    <section class="card">
+    <div class="explained-feature">
+        <details class="card feature-description" open>
+            <summary>📘 キーの説明</summary>
+            <div class="feature-description-content"><p>曲のキーを選択します。キーに合わせて、判定されたコードの音楽的な役割や次に進みやすいコードの表示が変わります。</p></div>
+        </details>
+        <section class="card">
         <h2>🎼 キー</h2>
 
         <label for="key-select">キー：</label>
@@ -66,9 +75,14 @@
             <option value="B-major">B</option>
         </select>
     </section>
+    </div>
 
-    <!-- コード表示 -->
-    <section class="card">
+    <div class="explained-feature">
+        <details class="card feature-description" open>
+            <summary>📘 コード判定の説明</summary>
+            <div class="feature-description-content"><p>鍵盤やギターで選んだ音、または音声解析で選択したコード名を表示します。構成音を確認し、再生ボタンで響きを聴くことができます。</p></div>
+        </details>
+        <section class="card">
         <h2>判定されたコード</h2>
 
         <div id="chord-name">---</div>
@@ -81,8 +95,9 @@
         </button>
         <p id="play-chord-status" aria-live="polite">解析結果のコードをクリックすると再生できます。</p>
     </section>
+    </div>
 
-    <!-- 説明カードと楽器カード -->
+        <!-- 説明カードと楽器カード -->
     <div class="feature-layout">
 
         <!-- 左側：説明カード -->
@@ -168,8 +183,12 @@
 
     </div>
 
-    <!-- コード情報 -->
-    <section class="card">
+<div class="explained-feature">
+        <details class="card feature-description" open>
+            <summary>📘 コード情報の説明</summary>
+            <div class="feature-description-content"><p>役割はキーの中での働き、次に来やすいコードは進行の候補、雰囲気はコードから受ける印象の目安です。作曲やコード進行を考える際の参考にできます。</p></div>
+        </details>
+        <section class="card">
         <h2>📖 コード情報</h2>
 
         <div id="chord-info">
@@ -191,8 +210,9 @@
 
         </div>
     </section>
+    </div>
 
-</main>
+    </main>
 
 <script src="js/chordDetector.js"></script>
 <script src="js/chordDatabase.js"></script>
