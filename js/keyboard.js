@@ -469,12 +469,12 @@ resetButton.addEventListener("click", () => {
 const guitar = document.getElementById("guitar");
 
 const guitarStrings = [
-    { name: "6弦 E", value: -8 },
-    { name: "5弦 A", value: -3 },
-    { name: "4弦 D", value: 2 },
-    { name: "3弦 G", value: 7 },
+    { name: "1弦 E", value: 16 },
     { name: "2弦 B", value: 11 },
-    { name: "1弦 E", value: 16 }
+    { name: "3弦 G", value: 7 },
+    { name: "4弦 D", value: 2 },
+    { name: "5弦 A", value: -3 },
+    { name: "6弦 E", value: -8 }
 ];
 
 const chromaticNotes = [
@@ -483,39 +483,34 @@ const chromaticNotes = [
 ];
 
 function restoreGuitarSelection() {
-    const highlightedPositions = new Set();
-
-    if (audioSelectedChord) {
-        const usedStrings = new Set();
-
-        // 各構成音につき1か所だけ選び、できるだけ別の弦に分散する
-        audioSelectedChord.notes.forEach(noteName => {
-            const candidates = [...document.querySelectorAll(".guitar-note")]
-                .filter(button => button.dataset.noteId.split("-")[1] === noteName)
-                .sort((a, b) => {
-                    const [stringA, fretA] = a.dataset.positionId.split("-").map(Number);
-                    const [stringB, fretB] = b.dataset.positionId.split("-").map(Number);
-                    const scoreA = fretA + (usedStrings.has(stringA) ? 100 : 0);
-                    const scoreB = fretB + (usedStrings.has(stringB) ? 100 : 0);
-                    return scoreA - scoreB;
-                });
-
-            if (candidates.length > 0) {
-                const chosen = candidates[0];
-                highlightedPositions.add(chosen.dataset.positionId);
-                usedStrings.add(Number(chosen.dataset.positionId.split("-")[0]));
-            }
-        });
-    }
-
+    // 音声解析コードの構成音はピアノだけに表示する。
+    // ギターはユーザーが実際にクリックした位置だけを選択表示する。
     document.querySelectorAll(".guitar-note").forEach(button => {
-        button.classList.toggle("selected", guitarNotes.includes(button.dataset.positionId));
         button.classList.toggle(
-            "audio-highlight",
-            highlightedPositions.has(button.dataset.positionId)
+            "selected",
+            guitarNotes.includes(button.dataset.positionId)
         );
+        button.classList.remove("audio-highlight");
     });
 }
+
+const markerRow = document.createElement("div");
+markerRow.className = "guitar-fret-markers";
+const markerSpacer = document.createElement("span");
+markerSpacer.className = "guitar-marker-spacer";
+markerRow.appendChild(markerSpacer);
+
+for (let fret = 0; fret <= 12; fret++) {
+    const cell = document.createElement("span");
+    cell.className = "guitar-fret-marker-cell";
+    if ([3, 5, 7, 9, 12].includes(fret)) {
+        const dot = document.createElement("span");
+        dot.className = "guitar-fret-dot" + (fret === 12 ? " double" : "");
+        cell.appendChild(dot);
+    }
+    markerRow.appendChild(cell);
+}
+guitar.appendChild(markerRow);
 
 guitarStrings.forEach((string, stringIndex) => {
     const row = document.createElement("div");
@@ -580,3 +575,18 @@ guitarStrings.forEach((string, stringIndex) => {
 
 restoreGuitarSelection();
 updateChordDisplay();
+
+const explanationCard = document.querySelector(".feature-description");
+const phoneLayout = window.matchMedia("(max-width: 700px)");
+
+function syncExplanationCard(event) {
+    if (!explanationCard) return;
+    explanationCard.open = !event.matches;
+}
+
+syncExplanationCard(phoneLayout);
+if (phoneLayout.addEventListener) {
+    phoneLayout.addEventListener("change", syncExplanationCard);
+} else {
+    phoneLayout.addListener(syncExplanationCard);
+}
