@@ -176,17 +176,83 @@ button {
 }
 
 /* =========================
-   スマートフォン対応
+   機能説明と操作画面
 ========================= */
 
-@media (max-width: 700px) {
+.feature-layout {
+    display: grid;
+    grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
+    gap: 20px;
+    width: 100%;
+    margin: 0;
+    align-items: start;
+}
 
+.feature-description,
+.feature-controls {
+    min-width: 0;
+    width: 100%;
+}
+
+.feature-description p {
+    line-height: 1.8;
+}
+
+.feature-description summary {
+    cursor: pointer;
+    font-size: 22px;
+    font-weight: bold;
+    list-style: none;
+}
+
+.feature-description summary::-webkit-details-marker {
+    display: none;
+}
+
+.feature-description summary::after {
+    content: " ＋";
+    float: right;
+    color: #666;
+    font-size: 18px;
+}
+
+.feature-description[open] summary::after {
+    content: " −";
+}
+
+.feature-description-content {
+    margin-top: 16px;
+}
+
+.feature-description-content p {
+    line-height: 1.8;
+}
+
+.feature-controls {
+    overflow: hidden;
+}
+
+.feature-controls h2 {
+    margin-top: 0;
+}
+
+/* タブレットはPCと同じ2列レイアウトを維持 */
+@media (min-width: 701px) {
     main {
+        max-width: 1400px;
+    }
+}
+
+/* スマートフォンのみ縦並び・説明カードをコンパクトに */
+@media (max-width: 700px) {
+    main {
+        width: 100%;
+        margin: 16px auto;
         padding: 0 10px;
     }
 
     .card {
-        padding: 18px;
+        padding: 16px;
     }
 
     #chord-name {
@@ -206,78 +272,44 @@ button {
         width: 42px;
         height: 115px;
     }
-}
-
-
-/* =========================
-   機能説明と操作画面
-========================= */
-
-/* =========================
-   機能説明と操作画面
-========================= */
-
-/* 機能説明と操作画面 */
-.feature-layout {
-    display: grid;
-    grid-template-columns: 300px minmax(0, 1fr);
-    gap: 46px;
-
-    width: calc(100% + 346px);
-    margin-left: -346px;
-
-    align-items: stretch;
-}
-
-/* 左側の説明カード */
-.feature-description {
-    min-width: 0;
-}
-
-.feature-description p {
-    line-height: 1.8;
-}
-
-/* 右側の楽器カード */
-.feature-controls {
-    width: 100%;
-    min-width: 0;
-    overflow: hidden;
-}
-
-.feature-controls h2 {
-    margin-top: 0;
-}
-
-/* スマートフォン */
-@media (max-width: 900px) {
-    main {
-        width: 100%;
-        margin: 16px auto;
-        padding: 0 10px;
-    }
 
     .feature-layout {
         display: flex;
         flex-direction: column;
-        width: 100%;
-        margin-left: 0;
-        gap: 16px;
+        gap: 12px;
     }
 
-    /* 説明は、説明対象の操作カードの下に配置 */
     .feature-controls {
         order: 1;
     }
 
     .feature-description {
         order: 2;
+        padding: 14px 16px;
+        margin-bottom: 16px;
     }
 
-    .feature-description,
-    .feature-controls {
-        width: 100%;
+    .feature-description summary {
+        font-size: 18px;
+    }
+
+    .feature-description-content {
+        margin-top: 10px;
+    }
+
+    .feature-description-content p {
+        margin: 8px 0;
+        line-height: 1.6;
+    }
+
+    .instrument-tabs {
+        gap: 6px;
+    }
+
+    .instrument-tab {
         min-width: 0;
+        padding: 10px 5px;
+        font-size: 14px;
     }
 
     header h1 {
@@ -347,22 +379,50 @@ button {
 #guitar {
     width: 100%;
     overflow-x: auto;
-    padding-bottom: 12px;
+    padding: 4px 0 12px;
 }
 
-.guitar-string-row {
+.guitar-string-row,
+.guitar-fret-markers {
     display: flex;
     align-items: center;
     gap: 5px;
     min-width: 850px;
+}
+
+.guitar-string-row {
     margin-bottom: 8px;
 }
 
-.guitar-string-label {
+.guitar-string-label,
+.guitar-marker-spacer {
     width: 65px;
     flex-shrink: 0;
+}
+
+.guitar-string-label {
     font-size: 12px;
     font-weight: bold;
+}
+
+.guitar-fret-marker-cell {
+    width: 48px;
+    height: 15px;
+    flex-shrink: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.guitar-fret-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #777;
+}
+
+.guitar-fret-dot.double {
+    box-shadow: 10px 0 0 #777;
 }
 
 .guitar-note {
