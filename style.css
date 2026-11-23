@@ -236,11 +236,15 @@ button {
     margin-top: 0;
 }
 
-/* タブレットはPCと同じ2列レイアウトを維持 */
-@media (min-width: 701px) {
-    main {
-        max-width: 1400px;
-    }
+/* PC・タブレットでは中央に幅を抑えた2列レイアウト */
+main {
+    max-width: 1100px;
+}
+
+.feature-layout {
+    grid-template-columns: 240px minmax(0, 1fr);
+    max-width: 1060px;
+    margin: 0 auto;
 }
 
 /* スマートフォンのみ縦並び・説明カードをコンパクトに */
@@ -263,13 +267,12 @@ button {
         height: 210px;
     }
 
+    /* 鍵盤の配置間隔は80px基準なので、幅を縮めず横スクロールで表示 */
     .piano-key.white {
-        width: 65px;
         height: 190px;
     }
 
     .piano-key.black {
-        width: 42px;
         height: 115px;
     }
 
