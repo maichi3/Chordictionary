@@ -152,7 +152,9 @@ function analyzeAudioBuffer(audioBuffer) {
 
 function mergeChordFrames(frames) {
     const groups = [];
-    const hopSeconds = ANALYSIS_HOP_SIZE / 44100;
+    const hopSeconds = frames.length > 1
+        ? frames[1].time - frames[0].time
+        : ANALYSIS_HOP_SIZE / 44100;
     const windowCount = Math.max(
         1,
         Math.round(ANALYSIS_WINDOW_SECONDS / hopSeconds)
