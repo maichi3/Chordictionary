@@ -236,22 +236,21 @@ button {
     margin-top: 0;
 }
 
-/* PC・タブレットでは中央に幅を抑えた2列レイアウト */
-main {
-    max-width: 1100px;
-}
-
-.feature-layout {
-    grid-template-columns: 240px minmax(0, 1fr);
-    max-width: 1060px;
-    margin: 0 auto;
-}
-
-/* PC・タブレットでは説明カードだけ画面左端に寄せる */
+/* PC・タブレット：左に説明、中央に楽器、右に同幅の余白 */
 @media (min-width: 701px) {
-    .feature-description {
-        position: relative;
-        left: calc((min(1100px, 100vw) - 100vw) / 2 - 20px);
+    .feature-layout {
+        width: 100vw;
+        max-width: none;
+        margin-left: calc(50% - 50vw);
+        grid-template-columns: 240px minmax(0, 1fr) 240px;
+        gap: 0;
+        align-items: start;
+    }
+
+    .feature-description,
+    .feature-controls {
+        margin: 0;
+        border-radius: 0;
     }
 }
 
