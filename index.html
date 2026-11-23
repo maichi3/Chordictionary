@@ -26,8 +26,19 @@
         <input
             type="file"
             id="audio-file"
-            accept=".mp3,audio/mpeg"
+            accept="audio/*,.mp3,.wav,.m4a,.webm,.ogg"
         >
+
+        <div class="mobile-recorder" id="mobile-recorder">
+            <p class="recorder-heading">🎙️ スマホで録音</p>
+            <div class="recorder-buttons">
+                <button type="button" id="record-start">● 録音開始</button>
+                <button type="button" id="record-stop" disabled>■ 録音停止</button>
+            </div>
+            <p id="record-status" aria-live="polite">
+                録音した音声はこの端末内で解析します。
+            </p>
+        </div>
 
         <p id="audio-status">
             音声ファイルを選択してください。

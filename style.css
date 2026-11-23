@@ -239,18 +239,19 @@ button {
 /* PC・タブレット：左に説明、中央に楽器、右に同幅の余白 */
 @media (min-width: 701px) {
     .feature-layout {
+        display: grid;
         width: 100vw;
         max-width: none;
         margin-left: calc(50% - 50vw);
         grid-template-columns: 240px minmax(0, 1fr) 240px;
-        gap: 0;
+        gap: 16px;
         align-items: start;
     }
 
     .feature-description,
     .feature-controls {
         margin: 0;
-        border-radius: 0;
+        border-radius: 14px;
     }
 }
 
@@ -333,6 +334,59 @@ button {
     .audio-chord-list li {
         flex-wrap: wrap;
         align-items: center;
+    }
+}
+
+/* =========================
+   スマホ録音
+========================= */
+
+.mobile-recorder {
+    display: none;
+    margin: 16px 0;
+    padding: 14px;
+    border: 1px solid #e2e2e8;
+    border-radius: 10px;
+    background: #fafaff;
+}
+
+.recorder-heading {
+    margin: 0 0 10px;
+    font-weight: bold;
+}
+
+.recorder-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.recorder-buttons button {
+    flex: 1;
+    padding: 11px 12px;
+    border-radius: 8px;
+    background: #29243f;
+    color: white;
+}
+
+.recorder-buttons button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+#record-stop {
+    background: #555;
+}
+
+#record-status {
+    margin: 10px 0 0;
+    color: #666;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+@media (max-width: 700px) {
+    .mobile-recorder {
+        display: block;
     }
 }
 

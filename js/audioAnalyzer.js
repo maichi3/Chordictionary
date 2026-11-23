@@ -1,14 +1,22 @@
-// MP3音声を読み込み、短い区間ごとにコードを推定する
-// 外部ライブラリを使わず、Web Audio APIとGoertzel法で解析する。
+// 音声ファイル・スマホ録音を解析する。
+// Web Audio APIとGoertzel法を使い、音声データはサーバーへ送信しない。
 
 const audioFileInput = document.getElementById("audio-file");
 const audioStatus = document.getElementById("audio-status");
 const audioResults = document.getElementById("audio-results");
 
+const recordStartButton = document.getElementById("record-start");
+const recordStopButton = document.getElementById("record-stop");
+const recordStatus = document.getElementById("record-status");
+
 const ANALYSIS_FRAME_SIZE = 8192;
 const ANALYSIS_HOP_SIZE = 4096;
 const ANALYSIS_WINDOW_SECONDS = 1.0;
 const MIN_CHORD_CONFIDENCE = 0.18;
+
+let mediaRecorder = null;
+let recordingStream = null;
+let recordingChunks = [];
 
 function goertzelMagnitude(samples, frequency, sampleRate) {
     const omega = 2 * Math.PI * frequency / sampleRate;
@@ -31,27 +39,26 @@ function goertzelMagnitude(samples, frequency, sampleRate) {
 
 function getFrameChroma(samples, sampleRate) {
     const chroma = Array(12).fill(0);
-    // Hann窓でフレーム端の不連続による周波数漏れを抑える
     const windowed = new Float32Array(samples.length);
+
     for (let i = 0; i < samples.length; i++) {
         const hann = 0.5 - 0.5 * Math.cos(
             2 * Math.PI * i / Math.max(1, samples.length - 1)
         );
         windowed[i] = samples[i] * hann;
     }
-    const firstMidi = 36;
-    const lastMidi = 84;
 
-    for (let midi = firstMidi; midi <= lastMidi; midi++) {
+    for (let midi = 36; midi <= 84; midi++) {
         const frequency = 440 * Math.pow(2, (midi - 69) / 12);
         if (frequency * 2 >= sampleRate / 2) continue;
 
         const fundamental = goertzelMagnitude(windowed, frequency, sampleRate);
-        const secondHarmonic = goertzelMagnitude(windowed, frequency * 2, sampleRate);
-        // 低音域はルート判定に重要なため少し重みを付ける
+        const secondHarmonic = goertzelMagnitude(
+            windowed, frequency * 2, sampleRate
+        );
         const registerWeight = midi <= 52 ? 1.45 : 1.0;
-        const energy = (fundamental + secondHarmonic * 0.2) * registerWeight;
-        chroma[midi % 12] += energy;
+        chroma[midi % 12] +=
+            (fundamental + secondHarmonic * 0.2) * registerWeight;
     }
 
     const maximum = Math.max(...chroma);
@@ -69,6 +76,7 @@ function estimateChord(chroma) {
             const chordPitchClasses = pattern.intervals.map(
                 interval => (root + interval) % 12
             );
+
             const inChord = chordPitchClasses.reduce(
                 (sum, pitch) => sum + chroma[pitch], 0
             ) / chordPitchClasses.length;
@@ -80,8 +88,15 @@ function estimateChord(chroma) {
             ) / Math.max(1, 12 - chordPitchClasses.length);
 
             const rootStrength = chroma[root];
-            const score = inChord - outOfChord * 0.65 + rootStrength * 0.12
-                + pattern.intervals.length * 0.003;
+
+            // 余分な構成音を持つ複雑な候補が過剰に選ばれないよう、
+            // 4音目以降に小さな複雑度ペナルティを加える。
+            const complexityPenalty =
+                Math.max(0, pattern.intervals.length - 3) * 0.012;
+
+            const score = inChord - outOfChord * 0.7 +
+                rootStrength * 0.12 - complexityPenalty;
+
             candidates.push({ root, pattern, score });
         }
     }
@@ -90,9 +105,8 @@ function estimateChord(chroma) {
     const best = candidates[0];
     if (!best || best.score < MIN_CHORD_CONFIDENCE) return null;
 
-    const rootName = noteNamesForAudio[best.root];
     return {
-        name: rootName + best.pattern.suffix,
+        name: noteNamesForAudio[best.root] + best.pattern.suffix,
         confidence: Math.max(0, Math.min(1, best.score))
     };
 }
@@ -105,6 +119,7 @@ const noteNamesForAudio = [
 function analyzeAudioBuffer(audioBuffer) {
     const channelCount = audioBuffer.numberOfChannels;
     const length = audioBuffer.length;
+    const sampleRate = audioBuffer.sampleRate;
     const mono = new Float32Array(length);
 
     for (let channel = 0; channel < channelCount; channel++) {
@@ -115,28 +130,34 @@ function analyzeAudioBuffer(audioBuffer) {
     }
 
     const frames = [];
-    for (
-        let start = 0;
-        start + ANALYSIS_FRAME_SIZE <= length;
-        start += ANALYSIS_HOP_SIZE
-    ) {
-        const frame = mono.slice(start, start + ANALYSIS_FRAME_SIZE);
-        const chroma = getFrameChroma(frame, audioBuffer.sampleRate);
+
+    // 最後の端数区間もゼロ埋めして解析し、末尾のコードを落とさない。
+    for (let start = 0; start < length; start += ANALYSIS_HOP_SIZE) {
+        const actualLength = Math.min(ANALYSIS_FRAME_SIZE, length - start);
+        if (actualLength < sampleRate * 0.25) break;
+
+        const frame = new Float32Array(ANALYSIS_FRAME_SIZE);
+        frame.set(mono.subarray(start, start + actualLength));
+
+        const chroma = getFrameChroma(frame, sampleRate);
         frames.push({
-            time: start / audioBuffer.sampleRate,
+            time: start / sampleRate,
+            endTime: Math.min(length, start + actualLength) / sampleRate,
             chord: estimateChord(chroma)
         });
     }
 
-    return mergeChordFrames(frames, audioBuffer.sampleRate);
+    return mergeChordFrames(frames);
 }
 
-function mergeChordFrames(frames, sampleRate) {
+function mergeChordFrames(frames) {
     const groups = [];
+    const hopSeconds = frames.length > 1
+        ? frames[1].time - frames[0].time
+        : ANALYSIS_HOP_SIZE / 44100;
     const windowCount = Math.max(
         1,
-        Math.round(ANALYSIS_WINDOW_SECONDS /
-            (ANALYSIS_HOP_SIZE / sampleRate))
+        Math.round(ANALYSIS_WINDOW_SECONDS / hopSeconds)
     );
 
     for (let i = 0; i < frames.length; i += windowCount) {
@@ -151,16 +172,17 @@ function mergeChordFrames(frames, sampleRate) {
         const [name, count] = [...counts.entries()]
             .sort((a, b) => b[1] - a[1])[0];
 
-        // 判定が割れている区間は無理に別コードとして表示しない
-        if (name === "判定できません" || count < Math.ceil(slice.length * 0.6)) {
+        if (
+            name === "判定できません" ||
+            count < Math.ceil(slice.length * 0.6)
+        ) {
             continue;
         }
 
         const start = slice[0].time;
-        const end = slice[slice.length - 1].time +
-            ANALYSIS_HOP_SIZE / sampleRate;
-
+        const end = slice[slice.length - 1].endTime;
         const previous = groups[groups.length - 1];
+
         if (previous && previous.name === name) {
             previous.end = end;
         } else {
@@ -220,14 +242,12 @@ function showAudioResults(groups) {
     audioResults.appendChild(list);
 }
 
-audioFileInput.addEventListener("change", async event => {
-    const file = event.target.files[0];
+async function processAudioFile(file) {
     if (!file) return;
 
-    if (!/\.mp3$/i.test(file.name) &&
-        file.type !== "audio/mpeg") {
-        audioStatus.textContent = "MP3ファイルを選択してください。";
-        audioFileInput.value = "";
+    if (!file.type.startsWith("audio/") &&
+        !/\.(mp3|wav|m4a|aac|ogg|opus|webm)$/i.test(file.name)) {
+        audioStatus.textContent = "音声ファイルを選択してください。";
         return;
     }
 
@@ -238,8 +258,11 @@ audioFileInput.addEventListener("change", async event => {
     try {
         const AudioContextClass =
             window.AudioContext || window.webkitAudioContext;
-        context = new AudioContextClass();
+        if (!AudioContextClass) {
+            throw new Error("このブラウザはAudioContextに対応していません。");
+        }
 
+        context = new AudioContextClass();
         const data = await file.arrayBuffer();
         const audioBuffer = await context.decodeAudioData(data);
         const groups = analyzeAudioBuffer(audioBuffer);
@@ -251,10 +274,129 @@ audioFileInput.addEventListener("change", async event => {
     } catch (error) {
         console.error("音声解析エラー:", error);
         audioStatus.textContent =
-            "音声を解析できませんでした。MP3形式か確認してください。";
+            "音声を解析できませんでした。このブラウザで再生できる音声形式か確認してください。";
     } finally {
         if (context && context.state !== "closed") {
             await context.close();
         }
     }
+}
+
+audioFileInput.addEventListener("change", event => {
+    const file = event.target.files[0];
+    if (file) processAudioFile(file);
 });
+
+function getSupportedRecordingType() {
+    if (!window.MediaRecorder || !MediaRecorder.isTypeSupported) return "";
+
+    const types = [
+        "audio/webm;codecs=opus",
+        "audio/mp4",
+        "audio/ogg;codecs=opus",
+        "audio/webm"
+    ];
+
+    return types.find(type => MediaRecorder.isTypeSupported(type)) || "";
+}
+
+async function startMobileRecording() {
+    if (!window.matchMedia("(max-width: 700px)").matches) return;
+
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia ||
+        !window.MediaRecorder) {
+        recordStatus.textContent =
+            "このブラウザでは録音機能を利用できません。音声ファイルを選択してください。";
+        return;
+    }
+
+    try {
+        recordingStream = await navigator.mediaDevices.getUserMedia({
+            audio: {
+                echoCancellation: false,
+                noiseSuppression: false,
+                autoGainControl: false
+            }
+        });
+
+        const mimeType = getSupportedRecordingType();
+        mediaRecorder = mimeType
+            ? new MediaRecorder(recordingStream, { mimeType })
+            : new MediaRecorder(recordingStream);
+
+        recordingChunks = [];
+
+        mediaRecorder.addEventListener("dataavailable", event => {
+            if (event.data && event.data.size > 0) {
+                recordingChunks.push(event.data);
+            }
+        });
+
+        mediaRecorder.addEventListener("stop", async () => {
+            const type = mediaRecorder.mimeType || "audio/webm";
+            const extension = type.includes("mp4") ? "m4a" :
+                type.includes("ogg") ? "ogg" : "webm";
+            const blob = new Blob(recordingChunks, { type });
+            const recordedFile = new File(
+                [blob],
+                "Chordictionary-recording." + extension,
+                { type }
+            );
+
+            if (recordingStream) {
+                recordingStream.getTracks().forEach(track => track.stop());
+                recordingStream = null;
+            }
+
+            recordStartButton.disabled = false;
+            recordStopButton.disabled = true;
+            recordStatus.textContent = "録音を終了しました。解析しています…";
+
+            await processAudioFile(recordedFile);
+            recordStatus.textContent =
+                "録音データの解析が終わりました。もう一度録音することもできます。";
+        });
+
+        mediaRecorder.addEventListener("error", event => {
+            console.error("録音エラー:", event.error);
+            recordStatus.textContent = "録音中にエラーが発生しました。";
+            recordStartButton.disabled = false;
+            recordStopButton.disabled = true;
+        });
+
+        mediaRecorder.start();
+        recordStartButton.disabled = true;
+        recordStopButton.disabled = false;
+        recordStatus.textContent =
+            "録音中です。演奏が終わったら「録音停止」を押してください。";
+    } catch (error) {
+        console.error("マイク利用エラー:", error);
+        if (recordingStream) {
+            recordingStream.getTracks().forEach(track => track.stop());
+            recordingStream = null;
+        }
+        recordStartButton.disabled = false;
+        recordStopButton.disabled = true;
+        recordStatus.textContent =
+            "マイクを使用できません。ブラウザのマイク許可を確認してください。";
+    }
+}
+
+function stopMobileRecording() {
+    if (mediaRecorder && mediaRecorder.state === "recording") {
+        recordStopButton.disabled = true;
+        mediaRecorder.stop();
+    }
+}
+
+if (recordStartButton && recordStopButton && recordStatus) {
+    recordStartButton.addEventListener("click", startMobileRecording);
+    recordStopButton.addEventListener("click", stopMobileRecording);
+
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia ||
+        !window.MediaRecorder) {
+        recordStartButton.disabled = true;
+        recordStatus.textContent =
+            "このブラウザは録音に対応していません。音声ファイルを選択してください。";
+    }
+}
