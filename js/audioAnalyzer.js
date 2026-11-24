@@ -66,8 +66,8 @@ function getFrameChroma(samples, sampleRate) {
 }
 
 function estimateChord(chroma) {
-    const totalEnergy = chroma.reduce((sum, value) => sum + value, 0);
-    if (totalEnergy < 0.01) return null;
+    const total = chroma.reduce((sum, value) => sum + value, 0);
+    if (total < 0.01) return null;
 
     const candidates = [];
 
@@ -76,41 +76,35 @@ function estimateChord(chroma) {
             const chordPitchClasses = pattern.intervals.map(
                 interval => (root + interval) % 12
             );
-            const chordPitchSet = new Set(chordPitchClasses);
 
-            // コード内に含まれる音のエネルギーと、コード外の音を分ける。
-            // 平均値ではなく全体に対する割合を使い、強い余分な音を見逃しにくくする。
-            const inChordEnergy = chroma.reduce(
-                (sum, value, pitch) =>
-                    sum + (chordPitchSet.has(pitch) ? value : 0),
-                0
-            );
-            const outOfChordEnergy = totalEnergy - inChordEnergy;
-            const inChordRatio = inChordEnergy / totalEnergy;
-            const outOfChordRatio = outOfChordEnergy / totalEnergy;
-
-            const rootRatio = chroma[root] / totalEnergy;
-
-            // 構成音の一部がほとんど検出されていない候補を少し減点する。
-            const missingTonePenalty = chordPitchClasses.reduce(
-                (sum, pitch) => sum + Math.max(0, 0.035 - chroma[pitch]),
-                0
+            const inChord = chordPitchClasses.reduce(
+                (sum, pitch) => sum + chroma[pitch], 0
             ) / chordPitchClasses.length;
 
-            // 4音以上の拡張コードやadd系が、基本的なコードより
-            // わずかな音量差だけで選ばれないよう複雑度を考慮する。
+            const outOfChord = chroma.reduce(
+                (sum, value, pitch) =>
+                    sum + (chordPitchClasses.includes(pitch) ? 0 : value),
+                0
+            ) / Math.max(1, 12 - chordPitchClasses.length);
+
+            const rootStrength = chroma[root];
+
+            // 4音目以降を含む候補は少しずつ減点し、
+            // 音数の多い拡張コードが有利になりすぎないようにする。
             const complexityPenalty =
-                Math.max(0, pattern.intervals.length - 3) * 0.022;
-            const addTonePenalty =
-                /add|9|11|13/.test(pattern.suffix) ? 0.018 : 0;
+                Math.max(0, pattern.intervals.length - 3) * 0.025;
+
+            // add系・テンション系は、基本コードより明確な追加音の
+            // 根拠がある場合に選ばれるよう、追加の減点を設ける。
+            const extensionPenalty =
+                /add|9|11|13|♭9|♯9/.test(pattern.suffix) ? 0.035 : 0;
 
             const score =
-                inChordRatio -
-                outOfChordRatio * 1.15 +
-                rootRatio * 0.2 -
-                missingTonePenalty * 0.5 -
+                inChord -
+                outOfChord * 0.7 +
+                rootStrength * 0.12 -
                 complexityPenalty -
-                addTonePenalty;
+                extensionPenalty;
 
             candidates.push({ root, pattern, score });
         }
