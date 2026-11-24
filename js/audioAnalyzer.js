@@ -134,7 +134,11 @@ function analyzeAudioBuffer(audioBuffer) {
     // 最後の端数区間もゼロ埋めして解析し、末尾のコードを落とさない。
     for (let start = 0; start < length; start += ANALYSIS_HOP_SIZE) {
         const actualLength = Math.min(ANALYSIS_FRAME_SIZE, length - start);
-        if (actualLength < sampleRate * 0.25) break;
+        const minimumFrameLength = Math.min(
+            ANALYSIS_FRAME_SIZE,
+            Math.floor(sampleRate * 0.1)
+        );
+        if (actualLength < minimumFrameLength) break;
 
         const frame = new Float32Array(ANALYSIS_FRAME_SIZE);
         frame.set(mono.subarray(start, start + actualLength));
@@ -399,4 +403,33 @@ if (recordStartButton && recordStopButton && recordStatus) {
         recordStatus.textContent =
             "このブラウザは録音に対応していません。音声ファイルを選択してください。";
     }
+}
+
+
+// 説明カードの動作：すべての端末で初期状態は展開。
+// PC・タブレットでは常時展開し、スマホでは各カードを個別に折りたためる。
+const descriptionMediaQuery = window.matchMedia("(max-width: 700px)");
+const allDescriptionCards = document.querySelectorAll(".feature-description");
+
+function syncDescriptionCards() {
+    if (!descriptionMediaQuery.matches) {
+        allDescriptionCards.forEach(card => {
+            card.open = true;
+        });
+    }
+}
+
+allDescriptionCards.forEach(card => {
+    card.addEventListener("toggle", () => {
+        if (!descriptionMediaQuery.matches && !card.open) {
+            card.open = true;
+        }
+    });
+});
+
+syncDescriptionCards();
+if (descriptionMediaQuery.addEventListener) {
+    descriptionMediaQuery.addEventListener("change", syncDescriptionCards);
+} else if (descriptionMediaQuery.addListener) {
+    descriptionMediaQuery.addListener(syncDescriptionCards);
 }

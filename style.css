@@ -179,7 +179,7 @@ button {
 .explained-feature {
     display: grid;
     grid-template-columns: 240px minmax(0, 1fr) 240px;
-    gap: 16px;
+    gap: 24px;
     align-items: stretch;
     width: 100vw;
     margin-left: calc(50% - 50vw);
@@ -239,9 +239,10 @@ button {
 .feature-layout {
     display: grid;
     grid-template-columns: 240px minmax(0, 1fr) 240px;
-    gap: 16px;
+    gap: 24px;
     width: 100vw;
     margin-left: calc(50% - 50vw);
+    margin-bottom: 24px;
     align-items: stretch;
 }
 
@@ -316,7 +317,10 @@ button {
         cursor: default;
     }
 
-    .feature-description summary::after { content: none; }
+    .feature-description summary::after {
+        display: none !important;
+        content: none !important;
+    }
 
     .feature-description,
     .feature-controls {
