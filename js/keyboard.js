@@ -423,8 +423,14 @@ function renderChordHistory() {
 }
 
 function addChordToHistory(chordName) {
-    if (!chordName || chordName === lastRecordedChordName) return;
-    if (!parseAnalyzedChord(chordName)) return;
+    if (!chordName || !parseAnalyzedChord(chordName)) return;
+
+    activeChordHistoryName = chordName;
+    if (chordName === lastRecordedChordName) {
+        renderChordHistory();
+        return;
+    }
+
     lastRecordedChordName = chordName;
     chordHistory = [chordName, ...chordHistory.filter(name => name !== chordName)]
         .slice(0, CHORD_HISTORY_LIMIT);
@@ -446,6 +452,8 @@ function updateChordDisplay() {
 
     if (selectedNotes.length === 0 && !audioSelectedChord) {
         lastRecordedChordName = null;
+        activeChordHistoryName = null;
+        renderChordHistory();
         chordName.textContent = "---";
         notesDisplay.textContent = "構成音：---";
         functionDisplay.textContent = "---";
@@ -506,6 +514,8 @@ function updateChordDisplay() {
             moodDisplay.textContent = "情報なし";
         }
     } else {
+        activeChordHistoryName = null;
+        renderChordHistory();
         chordName.textContent = "判定できません";
         functionDisplay.textContent = "---";
         nextChordsDisplay.textContent = "---";
