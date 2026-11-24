@@ -1,4 +1,3 @@
-
 const chordPatterns = [
     // ギターでよく使うパワーコード（ルート＋5度）
     { suffix: "5", intervals: [0, 7] },
@@ -46,9 +45,10 @@ const chordPatterns = [
     { suffix: "m11", intervals: [0, 2, 3, 5, 7, 10], optionalIntervals: [7] },
 
     // 13th系
-    { suffix: "13", intervals: [0, 2, 4, 5, 7, 9, 10], optionalIntervals: [7] },
-    { suffix: "maj13", intervals: [0, 2, 4, 5, 7, 9, 11], optionalIntervals: [7] },
-    { suffix: "m13", intervals: [0, 2, 3, 5, 7, 9, 10], optionalIntervals: [7] }
+    // 13thコードはギターでは完全5度と11度を省略することが多い。
+    { suffix: "13", intervals: [0, 2, 4, 5, 7, 9, 10], optionalIntervals: [5, 7] },
+    { suffix: "maj13", intervals: [0, 2, 4, 5, 7, 9, 11], optionalIntervals: [5, 7] },
+    { suffix: "m13", intervals: [0, 2, 3, 5, 7, 9, 10], optionalIntervals: [5, 7] }
 ];
 
 const noteNumbers = {
@@ -101,8 +101,7 @@ function detectChord(selectedNotes) {
             .sort((a, b) => a - b);
 
         for (const pattern of chordPatterns) {
-            // 7th・テンションコードは、ギターのボイシングで省略されやすい
-            // 完全5度（7）だけを省略可能にする。ルートやコードの性格を決める音は必須。
+            // 7th・テンションコードは、ギターのボイシングで省略されやすい音を許容する。
             const optionalIntervals = pattern.optionalIntervals || [];
             const requiredIntervals = pattern.intervals.filter(
                 interval => !optionalIntervals.includes(interval)
@@ -128,7 +127,6 @@ function detectChord(selectedNotes) {
                 bass: bass.name,
                 notes: uniqueNotes,
                 intervals: pattern.intervals,
-                // 完全一致を優先し、省略音がある場合は構成音の多いコードを優先
                 score: (isSlash ? 700 : 800) +
                     (pattern.intervals.length * 10) -
                     (omittedCount * 20) -
