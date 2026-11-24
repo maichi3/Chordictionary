@@ -58,9 +58,11 @@ function detectChord(selectedNotes) {
     if (selectedNotes.length < 3) return null;
 
     const noteData = selectedNotes.map(noteId => {
-        const parts = noteId.split("-");
-        const octave = Number(parts[0]);
-        const noteName = parts[1];
+        // ギターの低音弦は -1-E のように負のオクターブになるため、
+        // 最後のハイフンで音名とオクターブを分ける
+        const separator = noteId.lastIndexOf("-");
+        const octave = Number(noteId.slice(0, separator));
+        const noteName = noteId.slice(separator + 1);
 
         return {
             name: noteName,
