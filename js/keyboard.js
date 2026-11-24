@@ -255,7 +255,7 @@ function formatChordRole(chord, keyFunction, fallbackFunction) {
 // 音声解析で選択されたコード名を、コード情報と各楽器に反映する
 function parseAnalyzedChord(chordName) {
     // C6/9 のようなコード表記中の "/" と、C/E の分数コードを区別する
-    const slashMatch = chordName.match(/\\/([A-G]#?)$/);
+    const slashMatch = chordName.match(/\/([A-G]#?)$/);
     const baseName = slashMatch
         ? chordName.slice(0, slashMatch.index)
         : chordName;
