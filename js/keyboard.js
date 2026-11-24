@@ -395,6 +395,8 @@ function saveChordHistory() {
     }
 }
 
+let activeChordHistoryName = null;
+
 function renderChordHistory() {
     const list = document.getElementById("chord-history-list");
     const empty = document.getElementById("chord-history-empty");
@@ -408,11 +410,12 @@ function renderChordHistory() {
         button.type = "button";
         button.className = "chord-history-item";
         button.textContent = name;
+        button.classList.toggle("active", name === activeChordHistoryName);
         button.addEventListener("click", () => {
+            activeChordHistoryName = name;
             lastRecordedChordName = null;
             selectAnalyzedChord(name);
-            document.querySelectorAll(".chord-history-item").forEach(el => el.classList.remove("active"));
-            button.classList.add("active");
+            renderChordHistory();
         });
         item.appendChild(button);
         list.appendChild(item);
@@ -430,7 +433,8 @@ function addChordToHistory(chordName) {
 }
 
 renderChordHistory();
-\n// コード表示を更新
+
+// コード表示を更新
 function updateChordDisplay() {
     const chordName = document.getElementById("chord-name");
     const notesDisplay = document.getElementById("notes");

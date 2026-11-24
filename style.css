@@ -660,7 +660,7 @@ button {
     opacity: 0.45;
     cursor: not-allowed;
 }
-\n
+
 /* コード履歴：右側の専用カラムに合わせて固定 */
 .chord-history-card {
     width: 240px;
