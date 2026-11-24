@@ -406,9 +406,9 @@ if (recordStartButton && recordStopButton && recordStatus) {
 }
 
 
-// 説明カードの動作：PC・タブレットでは常時展開、スマホでは音声解析だけ初期折りたたみ。
+// 説明カードの動作：すべての端末で初期状態は展開。
+// PC・タブレットでは常時展開し、スマホでは各カードを個別に折りたためる。
 const descriptionMediaQuery = window.matchMedia("(max-width: 700px)");
-const audioDescriptionCard = document.querySelector(".audio-description");
 const allDescriptionCards = document.querySelectorAll(".feature-description");
 
 function syncDescriptionCards() {
@@ -416,8 +416,6 @@ function syncDescriptionCards() {
         allDescriptionCards.forEach(card => {
             card.open = true;
         });
-    } else if (audioDescriptionCard) {
-        audioDescriptionCard.open = false;
     }
 }
 
