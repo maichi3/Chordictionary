@@ -99,12 +99,27 @@ function estimateChord(chroma) {
             const extensionPenalty =
                 /add|9|11|13|♭9|♯9/.test(pattern.suffix) ? 0.035 : 0;
 
+            // susコードには3度が含まれないため、ルートに対する
+            // 長3度・短3度の音が十分に検出されている場合は、
+            // sus候補を少し下げて通常のメジャー／マイナー系を優先する。
+            // 弱い倍音や別パートの音だけでsus判定が崩れないよう、
+            // 一定値を超えた分だけ減点する。
+            const isSuspended = /^(sus2|sus4|7sus4)$/.test(pattern.suffix);
+            const thirdStrength = Math.max(
+                chroma[(root + 3) % 12],
+                chroma[(root + 4) % 12]
+            );
+            const suspendedThirdPenalty = isSuspended
+                ? Math.max(0, thirdStrength - 0.2) * 0.18
+                : 0;
+
             const score =
                 inChord -
                 outOfChord * 0.7 +
                 rootStrength * 0.12 -
                 complexityPenalty -
-                extensionPenalty;
+                extensionPenalty -
+                suspendedThirdPenalty;
 
             candidates.push({ root, pattern, score });
         }
