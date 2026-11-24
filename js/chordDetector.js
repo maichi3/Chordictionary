@@ -24,6 +24,9 @@ const chordPatterns = [
     { suffix: "dim7", intervals: [0, 3, 6, 9] },
     { suffix: "aug7", intervals: [0, 4, 8, 10] },
     { suffix: "7sus4", intervals: [0, 5, 7, 10] },
+    { suffix: "7♭5", intervals: [0, 4, 6, 10] },
+    { suffix: "7♯5", intervals: [0, 4, 8, 10] },
+    { suffix: "mMaj7", intervals: [0, 3, 7, 11], optionalIntervals: [7] },
 
     // add系
     { suffix: "add9", intervals: [0, 2, 4, 7] },
@@ -31,6 +34,7 @@ const chordPatterns = [
     { suffix: "add11", intervals: [0, 4, 5, 7] },
     { suffix: "madd11", intervals: [0, 3, 5, 7] },
     { suffix: "add13", intervals: [0, 4, 7, 9] },
+    { suffix: "6/9", intervals: [0, 2, 4, 7, 9], optionalIntervals: [7] },
 
     // 9th系
     { suffix: "9", intervals: [0, 2, 4, 7, 10], optionalIntervals: [7] },
@@ -48,6 +52,7 @@ const chordPatterns = [
     // 13thコードはギターでは完全5度と11度を省略することが多い。
     { suffix: "13", intervals: [0, 2, 4, 5, 7, 9, 10], optionalIntervals: [5, 7] },
     { suffix: "maj13", intervals: [0, 2, 4, 5, 7, 9, 11], optionalIntervals: [5, 7] },
+    { suffix: "maj7♯11", intervals: [0, 4, 6, 7, 11], optionalIntervals: [7] },
     { suffix: "m13", intervals: [0, 2, 3, 5, 7, 9, 10], optionalIntervals: [5, 7] }
 ];
 
