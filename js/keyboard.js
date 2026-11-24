@@ -669,17 +669,3 @@ guitarStrings.forEach((string, stringIndex) => {
 restoreGuitarSelection();
 updateChordDisplay();
 
-const explanationCard = document.querySelector(".feature-description");
-const phoneLayout = window.matchMedia("(max-width: 700px)");
-
-function syncExplanationCard(event) {
-    if (!explanationCard) return;
-    explanationCard.open = !event.matches;
-}
-
-syncExplanationCard(phoneLayout);
-if (phoneLayout.addEventListener) {
-    phoneLayout.addEventListener("change", syncExplanationCard);
-} else {
-    phoneLayout.addListener(syncExplanationCard);
-}
