@@ -1,5 +1,8 @@
 
 const chordPatterns = [
+    // ギターでよく使うパワーコード（ルート＋5度）
+    { suffix: "5", intervals: [0, 7] },
+
     // 基本コード
     { suffix: "", intervals: [0, 4, 7] },
     { suffix: "m", intervals: [0, 3, 7] },
@@ -38,11 +41,11 @@ const chordPatterns = [
     { suffix: "7♭9", intervals: [0, 1, 4, 7, 10] },
     { suffix: "7♯9", intervals: [0, 3, 4, 7, 10] },
 
-    // 11th系（音を省略しない基本形）
+    // 11th系
     { suffix: "11", intervals: [0, 2, 4, 5, 7, 10] },
     { suffix: "m11", intervals: [0, 2, 3, 5, 7, 10] },
 
-    // 13th系（音を省略しない基本形）
+    // 13th系
     { suffix: "13", intervals: [0, 2, 4, 5, 7, 9, 10] },
     { suffix: "maj13", intervals: [0, 2, 4, 5, 7, 9, 11] },
     { suffix: "m13", intervals: [0, 2, 3, 5, 7, 9, 10] }
@@ -55,34 +58,43 @@ const noteNumbers = {
 };
 
 function detectChord(selectedNotes) {
-    if (selectedNotes.length < 3) return null;
+    if (!Array.isArray(selectedNotes) || selectedNotes.length < 2) return null;
 
     const noteData = selectedNotes.map(noteId => {
-        // ギターの低音弦は -1-E のように負のオクターブになるため、
-        // 最後のハイフンで音名とオクターブを分ける
+        // 音名は最後のハイフンより後ろ。-1-E のような低音域にも対応する。
         const separator = noteId.lastIndexOf("-");
         const octave = Number(noteId.slice(0, separator));
         const noteName = noteId.slice(separator + 1);
+
+        if (
+            separator < 1 ||
+            !Number.isInteger(octave) ||
+            !Object.prototype.hasOwnProperty.call(noteNumbers, noteName)
+        ) {
+            return null;
+        }
 
         return {
             name: noteName,
             octave,
             value: octave * 12 + noteNumbers[noteName]
         };
-    });
+    }).filter(Boolean);
 
+    if (noteData.length < 2) return null;
+
+    // 最も低い実音をベース音として扱う（スラッシュコード判定用）。
     const bass = noteData.reduce((lowest, note) =>
         note.value < lowest.value ? note : lowest
     );
 
+    // 同じ音名を複数弦で押さえても、コード構成音としては1音にまとめる。
     const uniqueNotes = [...new Set(noteData.map(note => note.name))];
-
-    if (uniqueNotes.length < 3) return null;
+    if (uniqueNotes.length < 2) return null;
 
     const noteValues = uniqueNotes.map(note => noteNumbers[note]);
     const candidates = [];
 
-    // すべての音をコードの構成音と照合する
     for (const root of noteValues) {
         const intervals = noteValues
             .map(note => (note - root + 12) % 12)
@@ -98,7 +110,6 @@ function detectChord(selectedNotes) {
 
             const rootName = Object.keys(noteNumbers)
                 .find(name => noteNumbers[name] === root);
-
             const isSlash = bass.name !== rootName;
 
             candidates.push({
