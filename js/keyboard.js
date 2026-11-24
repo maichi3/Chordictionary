@@ -368,7 +368,69 @@ if (playChordButton) {
     playChordButton.addEventListener("click", playSelectedChord);
 }
 
-// コード表示を更新
+
+// 最近選択したコードをブラウザに保存する履歴機能
+const CHORD_HISTORY_STORAGE_KEY = "chordictionary-chord-history-v1";
+const CHORD_HISTORY_LIMIT = 10;
+let chordHistory = loadChordHistory();
+let lastRecordedChordName = null;
+
+function loadChordHistory() {
+    try {
+        const saved = JSON.parse(localStorage.getItem(CHORD_HISTORY_STORAGE_KEY) || "[]");
+        return Array.isArray(saved)
+            ? saved.filter(item => typeof item === "string" && parseAnalyzedChord(item)).slice(0, CHORD_HISTORY_LIMIT)
+            : [];
+    } catch (error) {
+        console.warn("コード履歴を読み込めませんでした:", error);
+        return [];
+    }
+}
+
+function saveChordHistory() {
+    try {
+        localStorage.setItem(CHORD_HISTORY_STORAGE_KEY, JSON.stringify(chordHistory));
+    } catch (error) {
+        console.warn("コード履歴を保存できませんでした:", error);
+    }
+}
+
+function renderChordHistory() {
+    const list = document.getElementById("chord-history-list");
+    const empty = document.getElementById("chord-history-empty");
+    if (!list || !empty) return;
+    list.replaceChildren();
+    empty.hidden = chordHistory.length > 0;
+
+    chordHistory.forEach(name => {
+        const item = document.createElement("li");
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "chord-history-item";
+        button.textContent = name;
+        button.addEventListener("click", () => {
+            lastRecordedChordName = null;
+            selectAnalyzedChord(name);
+            document.querySelectorAll(".chord-history-item").forEach(el => el.classList.remove("active"));
+            button.classList.add("active");
+        });
+        item.appendChild(button);
+        list.appendChild(item);
+    });
+}
+
+function addChordToHistory(chordName) {
+    if (!chordName || chordName === lastRecordedChordName) return;
+    if (!parseAnalyzedChord(chordName)) return;
+    lastRecordedChordName = chordName;
+    chordHistory = [chordName, ...chordHistory.filter(name => name !== chordName)]
+        .slice(0, CHORD_HISTORY_LIMIT);
+    saveChordHistory();
+    renderChordHistory();
+}
+
+renderChordHistory();
+\n// コード表示を更新
 function updateChordDisplay() {
     const chordName = document.getElementById("chord-name");
     const notesDisplay = document.getElementById("notes");
@@ -379,6 +441,7 @@ function updateChordDisplay() {
     const selectedNotes = getAllSelectedNotes();
 
     if (selectedNotes.length === 0 && !audioSelectedChord) {
+        lastRecordedChordName = null;
         chordName.textContent = "---";
         notesDisplay.textContent = "構成音：---";
         functionDisplay.textContent = "---";
@@ -411,6 +474,7 @@ function updateChordDisplay() {
             : sortedNotes.map(note => note.split("-")[1]).join(" - "));
 
     if (chord) {
+        addChordToHistory(chord.name);
         chordName.textContent = chord.name;
 
         const information = chordDatabase[chord.name];
