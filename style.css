@@ -242,6 +242,7 @@ button {
     gap: 24px;
     width: 100vw;
     margin-left: calc(50% - 50vw);
+    margin-bottom: 24px;
     align-items: stretch;
 }
 
