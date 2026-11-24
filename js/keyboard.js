@@ -254,9 +254,12 @@ function formatChordRole(chord, keyFunction, fallbackFunction) {
 
 // 音声解析で選択されたコード名を、コード情報と各楽器に反映する
 function parseAnalyzedChord(chordName) {
-    const parts = chordName.split("/");
-    const baseName = parts[0];
-    const bassName = parts[1] || null;
+    // C6/9 のようなコード表記中の "/" と、C/E の分数コードを区別する
+    const slashMatch = chordName.match(/\\/([A-G]#?)$/);
+    const baseName = slashMatch
+        ? chordName.slice(0, slashMatch.index)
+        : chordName;
+    const bassName = slashMatch ? slashMatch[1] : null;
     const root = [...noteNamesForDisplay]
         .sort((a, b) => b.length - a.length)
         .find(note => baseName.startsWith(note));
@@ -638,9 +641,17 @@ guitarStrings.forEach((string, stringIndex) => {
             });
 
             if (guitarNotes.includes(positionId)) {
+                // 選択済みの同じ位置を押したら解除
                 const index = guitarNotes.indexOf(positionId);
                 guitarNotes.splice(index, 1);
             } else {
+                // 同じ弦の別フレットを選んだ場合、以前の選択を解除して入れ替える
+                const selectedStringIndex = String(stringIndex) + "-";
+                for (let i = guitarNotes.length - 1; i >= 0; i--) {
+                    if (guitarNotes[i].startsWith(selectedStringIndex)) {
+                        guitarNotes.splice(i, 1);
+                    }
+                }
                 guitarNotes.push(positionId);
             }
 
