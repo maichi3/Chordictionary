@@ -467,14 +467,18 @@ function updateChordDisplay() {
     if (playChordButton) playChordButton.disabled = false;
 
     const sortedNotes = [...selectedNotes].sort((a, b) => {
-        const [octaveA, noteA] = a.split("-");
-        const [octaveB, noteB] = b.split("-");
+        const separatorA = a.lastIndexOf("-");
+        const separatorB = b.lastIndexOf("-");
+        const octaveA = Number(a.slice(0, separatorA));
+        const octaveB = Number(b.slice(0, separatorB));
+        const noteA = a.slice(separatorA + 1);
+        const noteB = b.slice(separatorB + 1);
 
         const valueA =
-            Number(octaveA) * 12 + noteNumbers[noteA];
+            octaveA * 12 + noteNumbers[noteA];
 
         const valueB =
-            Number(octaveB) * 12 + noteNumbers[noteB];
+            octaveB * 12 + noteNumbers[noteB];
 
         return valueA - valueB;
     });
