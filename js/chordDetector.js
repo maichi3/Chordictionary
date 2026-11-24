@@ -18,9 +18,9 @@ const chordPatterns = [
     { suffix: "m6", intervals: [0, 3, 7, 9] },
 
     // 7th
-    { suffix: "7", intervals: [0, 4, 7, 10] },
-    { suffix: "maj7", intervals: [0, 4, 7, 11] },
-    { suffix: "m7", intervals: [0, 3, 7, 10] },
+    { suffix: "7", intervals: [0, 4, 7, 10], optionalIntervals: [7] },
+    { suffix: "maj7", intervals: [0, 4, 7, 11], optionalIntervals: [7] },
+    { suffix: "m7", intervals: [0, 3, 7, 10], optionalIntervals: [7] },
     { suffix: "m7♭5", intervals: [0, 3, 6, 10] },
     { suffix: "dim7", intervals: [0, 3, 6, 9] },
     { suffix: "aug7", intervals: [0, 4, 8, 10] },
@@ -34,21 +34,21 @@ const chordPatterns = [
     { suffix: "add13", intervals: [0, 4, 7, 9] },
 
     // 9th系
-    { suffix: "9", intervals: [0, 2, 4, 7, 10] },
-    { suffix: "maj9", intervals: [0, 2, 4, 7, 11] },
-    { suffix: "m9", intervals: [0, 2, 3, 7, 10] },
-    { suffix: "mMaj9", intervals: [0, 2, 3, 7, 11] },
+    { suffix: "9", intervals: [0, 2, 4, 7, 10], optionalIntervals: [7] },
+    { suffix: "maj9", intervals: [0, 2, 4, 7, 11], optionalIntervals: [7] },
+    { suffix: "m9", intervals: [0, 2, 3, 7, 10], optionalIntervals: [7] },
+    { suffix: "mMaj9", intervals: [0, 2, 3, 7, 11], optionalIntervals: [7] },
     { suffix: "7♭9", intervals: [0, 1, 4, 7, 10] },
     { suffix: "7♯9", intervals: [0, 3, 4, 7, 10] },
 
     // 11th系
-    { suffix: "11", intervals: [0, 2, 4, 5, 7, 10] },
-    { suffix: "m11", intervals: [0, 2, 3, 5, 7, 10] },
+    { suffix: "11", intervals: [0, 2, 4, 5, 7, 10], optionalIntervals: [7] },
+    { suffix: "m11", intervals: [0, 2, 3, 5, 7, 10], optionalIntervals: [7] },
 
     // 13th系
-    { suffix: "13", intervals: [0, 2, 4, 5, 7, 9, 10] },
-    { suffix: "maj13", intervals: [0, 2, 4, 5, 7, 9, 11] },
-    { suffix: "m13", intervals: [0, 2, 3, 5, 7, 9, 10] }
+    { suffix: "13", intervals: [0, 2, 4, 5, 7, 9, 10], optionalIntervals: [7] },
+    { suffix: "maj13", intervals: [0, 2, 4, 5, 7, 9, 11], optionalIntervals: [7] },
+    { suffix: "m13", intervals: [0, 2, 3, 5, 7, 9, 10], optionalIntervals: [7] }
 ];
 
 const noteNumbers = {
@@ -101,16 +101,25 @@ function detectChord(selectedNotes) {
             .sort((a, b) => a - b);
 
         for (const pattern of chordPatterns) {
-            if (
-                intervals.length !== pattern.intervals.length ||
-                !intervals.every((value, index) =>
-                    value === pattern.intervals[index]
-                )
-            ) continue;
+            // 7th・テンションコードは、ギターのボイシングで省略されやすい
+            // 完全5度（7）だけを省略可能にする。ルートやコードの性格を決める音は必須。
+            const optionalIntervals = pattern.optionalIntervals || [];
+            const requiredIntervals = pattern.intervals.filter(
+                interval => !optionalIntervals.includes(interval)
+            );
+            const isSubset = intervals.every(interval =>
+                pattern.intervals.includes(interval)
+            );
+            const hasRequiredNotes = requiredIntervals.every(interval =>
+                intervals.includes(interval)
+            );
+
+            if (!isSubset || !hasRequiredNotes) continue;
 
             const rootName = Object.keys(noteNumbers)
                 .find(name => noteNumbers[name] === root);
             const isSlash = bass.name !== rootName;
+            const omittedCount = pattern.intervals.length - intervals.length;
 
             candidates.push({
                 name: rootName + pattern.suffix +
@@ -119,7 +128,11 @@ function detectChord(selectedNotes) {
                 bass: bass.name,
                 notes: uniqueNotes,
                 intervals: pattern.intervals,
-                score: isSlash ? 70 : 100
+                // 完全一致を優先し、省略音がある場合は構成音の多いコードを優先
+                score: (isSlash ? 700 : 800) +
+                    (pattern.intervals.length * 10) -
+                    (omittedCount * 20) -
+                    (isSubset && omittedCount > 0 ? 1 : 0)
             });
         }
     }
