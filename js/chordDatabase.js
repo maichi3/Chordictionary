@@ -135,6 +135,11 @@ Object.assign(chordDatabase, {
         next: "F / Am / Dm",
         mood: "おしゃれ・穏やか"
     },
+    "Cmaj9": {
+        function: "トニック系",
+        next: "Fmaj7 / Dm7 / G7 / Am7",
+        mood: "透明感・都会的・柔らかい浮遊感"
+    },
     "D": {
         function: "トニック系",
         next: "G / A / Bm",
