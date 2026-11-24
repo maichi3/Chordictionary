@@ -487,7 +487,7 @@ function updateChordDisplay() {
         "構成音：" +
         (audioSelectedChord
             ? audioSelectedChord.notes.join(" - ")
-            : sortedNotes.map(note => note.split("-")[1]).join(" - "));
+            : sortedNotes.map(note => note.slice(note.lastIndexOf("-") + 1)).join(" - "));
 
     if (chord) {
         addChordToHistory(chord.name);
