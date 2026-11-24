@@ -661,9 +661,10 @@ button {
     cursor: not-allowed;
 }
 \n
-/* コード履歴：広い画面では右端に固定 */
+/* コード履歴：右側の専用カラムに合わせて固定 */
 .chord-history-card {
-    width: 220px;
+    width: 240px;
+    min-width: 240px;
     padding: 18px;
 }
 
@@ -708,9 +709,10 @@ button {
     .chord-history-card {
         position: fixed;
         z-index: 20;
-        top: 120px;
-        right: max(16px, calc((100vw - 1100px) / 2));
-        max-height: calc(100vh - 140px);
+        top: 208px;
+        right: 0;
+        width: 240px;
+        max-height: calc(100vh - 232px);
         overflow-y: auto;
         margin: 0;
     }
